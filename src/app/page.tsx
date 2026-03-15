@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { ModeSelector, type ResearchMode } from "@/components/ModeSelector";
 import { ResearchForm } from "@/components/ResearchForm";
 import { ReportView } from "@/components/ReportView";
+import { Header } from "@/components/Header";
 
 /**
  * EquiScan — NGX Research Tool
@@ -51,15 +52,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[var(--content-max)] px-[var(--space-gutter)] py-[var(--space-block)]">
-      {/* Header: identity + one-line purpose */}
-      <header className="mb-[var(--space-block)]">
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-3xl">
-          EquiScan
-        </h1>
-        <p className="mt-1 text-sm text-[var(--color-mute)]">
-          NGX research — discovery and verification reports
-        </p>
-      </header>
+      <Header />
 
       {/* Mode + form: primary action surface */}
       <section

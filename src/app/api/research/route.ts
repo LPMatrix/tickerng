@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { auth } from "@/auth";
 import { getSystemPrompt, getUserMessage } from "@/lib/prompts";
 import type { ResearchMode } from "@/lib/prompts";
 
@@ -8,6 +9,11 @@ const MAX_TOKENS = 8192;
 const WEB_SEARCH_MAX_USES = 10;
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return NextResponse.json(

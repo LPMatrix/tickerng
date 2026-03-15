@@ -14,6 +14,7 @@ dist
 *.pem
 .env*.local
 .vercel
+data/
 
 # debug
 npm-debug.log*

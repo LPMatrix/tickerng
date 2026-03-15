@@ -21,21 +21,23 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
 
 ## Run locally
 
-1. **Install and set API key**
+1. **Install and set env**
    ```bash
    npm install
    cp .env.example .env.local
    ```
-   Add your [Anthropic API key](https://console.anthropic.com/) to `.env.local`:
-   ```
-   ANTHROPIC_API_KEY=sk-ant-...
-   ```
+   Edit `.env.local`:
+   - `ANTHROPIC_API_KEY` — [Anthropic API key](https://console.anthropic.com/)
+   - `AUTH_SECRET` — generate with `openssl rand -base64 32`
 
-2. **Start dev server**
+2. **Database**  
+   SQLite DB is created at `./data/equiscan.db` on first run. Tables are created automatically. Optional: run `npm run db:push` after installing (requires `better-sqlite3` native build).
+
+3. **Start dev server**
    ```bash
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000). Use **Verification** with a ticker (e.g. `GTCO`, `DANGCEM`) or **Discovery** with a natural language query (e.g. "best banking stocks right now"). Reports are streamed from Claude with web search enabled.
+   Open [http://localhost:3000](http://localhost:3000). You’ll be redirected to **Sign in**; use **Sign up** to create an account, then sign in. After that you can run **Verification** (ticker) or **Discovery** (natural language) and get streamed reports.
 
 ## MVP scope (from PRD)
 
