@@ -5,12 +5,21 @@ export default auth((req) => {
   const path = req.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/signin") || path.startsWith("/signup");
   const isApiAuth = path.startsWith("/api/auth");
+  const isPublicRoute = path === "/" || path.startsWith("/_next") || path.startsWith("/favicon");
+  const isAppRoute = path.startsWith("/research");
 
   if (isApiAuth) return;
+  
+  // Redirect signed-in users from auth routes to research app
   if (isAuthRoute && isSignedIn) {
-    return Response.redirect(new URL("/", req.nextUrl));
+    return Response.redirect(new URL("/research", req.nextUrl));
   }
-  if (!isAuthRoute && !isSignedIn) {
+  
+  // Allow public access to landing page
+  if (isPublicRoute) return;
+  
+  // Protect app routes - redirect to signin if not authenticated
+  if ((isAppRoute || !isAuthRoute) && !isSignedIn) {
     return Response.redirect(new URL("/signin", req.nextUrl));
   }
 });

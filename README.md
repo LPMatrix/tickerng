@@ -44,4 +44,7 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
 - Mode toggle: Discovery / Verification
 - Text input per mode (ticker or natural language)
 - Streamed report rendered with structured sections
+- Auth, SQLite, and report persistence (saved reports + Recent list below header)
 - Clean, readable UI — desktop and mobile
+
+See **[ROADMAP.md](./ROADMAP.md)** for v2 plans (drill-down, confidence UI, export, share link, macro context).

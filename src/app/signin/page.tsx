@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { BarChart3, ArrowLeft } from "lucide-react";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ export default function SignInPage() {
         setError("Invalid email or password");
         return;
       }
-      window.location.href = "/";
+      window.location.href = "/research";
     } finally {
       setLoading(false);
     }
@@ -33,12 +34,26 @@ export default function SignInPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-[var(--content-max)] flex-col justify-center px-[var(--space-gutter)] py-[var(--space-block)]">
       <div className="w-full max-w-sm">
-        <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
-          Sign in
-        </h1>
-        <p className="mt-1 text-sm text-[var(--color-mute)]">
-          EquiScan — NGX research
-        </p>
+        <Link 
+          href="/" 
+          className="mb-6 inline-flex items-center gap-1.5 text-sm text-[var(--color-mute)] hover:text-[var(--color-accent)] transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white">
+            <BarChart3 className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-display text-2xl font-semibold text-[var(--color-ink)]">
+              Sign in
+            </h1>
+            <p className="text-sm text-[var(--color-mute)]">
+              EquiScan — NGX research
+            </p>
+          </div>
+        </div>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="block">
             <span className="text-sm font-medium text-[var(--color-ink)]">

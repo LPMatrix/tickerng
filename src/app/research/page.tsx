@@ -78,56 +78,51 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="mx-auto min-h-screen max-w-[var(--content-max)] px-[var(--space-gutter)] py-[var(--space-block)]">
-      <Header />
+    <div className="flex min-h-screen flex-col md:flex-row">
+      {/* Main content */}
+      <main className="min-w-0 flex-1 px-[var(--space-gutter)] py-[var(--space-block)] md:max-w-[var(--content-max)]">
+        <Header />
 
-      {/* Mode + form: primary action surface */}
-      <section
-        role="tabpanel"
-        id={mode === "discovery" ? "discovery-panel" : "verification-panel"}
-        aria-labelledby={`mode-${mode}`}
-        className="flex flex-col gap-6"
-      >
-        <div className="flex flex-wrap items-center gap-4">
-          <ModeSelector value={mode} onChange={setMode} disabled={isRunning} />
-        </div>
-        <ResearchForm
-          mode={mode}
-          onSubmit={handleSubmit}
-          isRunning={isRunning}
-        />
-      </section>
+        <section
+          role="tabpanel"
+          id={mode === "discovery" ? "discovery-panel" : "verification-panel"}
+          aria-labelledby={`mode-${mode}`}
+          className="flex flex-col gap-6"
+        >
+          <div className="flex flex-wrap items-center gap-4">
+            <ModeSelector value={mode} onChange={setMode} disabled={isRunning} />
+          </div>
+          <ResearchForm
+            mode={mode}
+            onSubmit={handleSubmit}
+            isRunning={isRunning}
+          />
+        </section>
 
-      {/* Report output: streamed or loaded from history */}
-      {report ? (
-        <ReportView content={report} isStreaming={isRunning} />
-      ) : (
-        <div className="mt-[var(--space-block)] flex flex-col gap-6 border-t border-[var(--color-border)] pt-[var(--space-block)] sm:flex-row sm:gap-8">
-          <div className="min-w-0 flex-1">
+        {report ? (
+          <ReportView content={report} isStreaming={isRunning} />
+        ) : (
+          <div className="mt-[var(--space-block)] border-t border-[var(--color-border)] pt-[var(--space-block)]">
             <p className="text-sm text-[var(--color-mute)]">
-              Select a mode, enter a ticker or discovery query, and run research. Reports are saved automatically and appear below.
+              Select a mode, enter a ticker or discovery query, and run research. Reports are saved automatically and listed in the sidebar.
             </p>
           </div>
-          <aside className="w-full shrink-0 sm:w-56">
-            <ReportHistory
-              reportsVersion={reportsVersion}
-              onSelectReport={handleSelectReport}
-              currentReportId={currentReportId}
-            />
-          </aside>
-        </div>
-      )}
+        )}
+      </main>
 
-      {/* When viewing a report, show history in sidebar */}
-      {report && (
-        <aside className="mt-[var(--space-block)] border-t border-[var(--color-border)] pt-[var(--space-block)]">
+      {/* Sidebar: recent reports */}
+      <aside
+        className="w-full border-t border-[var(--color-border)] bg-[var(--color-surface)] md:w-64 md:min-h-screen md:max-h-screen md:border-l md:border-t-0 md:sticky md:top-0 md:flex md:flex-col md:self-start"
+        aria-label="Recent reports"
+      >
+        <div className="flex-1 overflow-y-auto p-4">
           <ReportHistory
             reportsVersion={reportsVersion}
             onSelectReport={handleSelectReport}
             currentReportId={currentReportId}
           />
-        </aside>
-      )}
+        </div>
+      </aside>
     </div>
   );
 }
