@@ -1,52 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
-import { BarChart3, ArrowLeft } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import { BarChart3, LogOut, User, ChevronRight } from "lucide-react";
 
 export function Header() {
   const { data: session, status } = useSession();
 
   return (
-    <header className="mb-[var(--space-block)]">
-      {/* Back link */}
-      <Link 
-        href="/" 
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--color-mute)] hover:text-[var(--color-accent)] transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to home
-      </Link>
-      
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white">
-            <BarChart3 className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-[var(--color-ink)] sm:text-3xl">
+    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--color-bg)]/80">
+      <div className="flex h-16 items-center justify-between px-4 md:px-8 lg:px-12">
+        {/* Logo & Breadcrumb */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white shadow-sm">
+              <BarChart3 className="h-5 w-5" />
+            </div>
+            <span className="hidden font-display text-xl font-semibold tracking-tight text-[var(--color-ink)] sm:block">
               EquiScan
-            </h1>
-            <p className="mt-0.5 text-sm text-[var(--color-mute)]">
-              NGX research — discovery and verification reports
-            </p>
-          </div>
-        </div>
-        {status === "authenticated" && session?.user && (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-[var(--color-mute)]">
-              {session.user.email}
             </span>
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: "/signin" })}
-              className="rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-accent-dim)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+          </Link>
+          
+          <div className="hidden h-4 w-px bg-[var(--color-border-strong)] sm:block" />
+          
+          <nav className="hidden items-center gap-1 text-sm sm:flex">
+            <Link 
+              href="/" 
+              className="text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors"
             >
-              Sign out
-            </button>
-          </div>
-        )}
+              Home
+            </Link>
+            <ChevronRight className="h-4 w-4 text-[var(--color-mute-light)]" />
+            <span className="font-medium text-[var(--color-ink)]">Research</span>
+          </nav>
+        </div>
+
+        {/* User Actions */}
+        <div className="flex items-center gap-3">
+          {status === "authenticated" && session?.user ? (
+            <>
+              <div className="hidden items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5 sm:flex">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                  <User className="h-3.5 w-3.5" />
+                </div>
+                <span className="max-w-[150px] truncate text-sm text-[var(--color-ink)]">
+                  {session.user.email}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/signin" })}
+                className="flex items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-mute)] transition-all hover:border-[var(--color-accent)]/30 hover:text-[var(--color-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign out</span>
+              </button>
+            </>
+          ) : (
+            <div className="h-8 w-8 animate-pulse rounded-full bg-[var(--color-border)]" />
+          )}
+        </div>
       </div>
     </header>
   );
