@@ -3,9 +3,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getSystemPrompt, getUserMessage } from "@/lib/prompts";
 import type { ResearchMode } from "@/lib/prompts";
 
-const MODEL = "claude-sonnet-4-5-20250929";
+const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 8192;
-const WEB_SEARCH_MAX_USES = 5;
+const WEB_SEARCH_MAX_USES = 10;
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -37,14 +37,10 @@ export async function POST(request: NextRequest) {
       max_tokens: MAX_TOKENS,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
-      // Web search is a server-side tool; SDK Tool type is for client tools, so we cast
+      // Server-side web search tool (SDK types only cover client tools)
       tools: [
-        {
-          type: "web_search_20250305",
-          name: "web_search",
-          max_uses: WEB_SEARCH_MAX_USES,
-        },
-      ] as unknown as Array<{ name: string; input_schema: object }>,
+        { type: "web_search_20250305", name: "web_search", max_uses: WEB_SEARCH_MAX_USES },
+      ] as never,
     });
 
     const encoder = new TextEncoder();
@@ -63,7 +59,7 @@ export async function POST(request: NextRequest) {
         } catch (err) {
           const message = err instanceof Error ? err.message : "Stream error";
           controller.enqueue(
-            encoder.encode(`\n\n## Error\n\n${message}`)
+            encoder.encode(`\x00ERROR\x00${message}`)
           );
           controller.close();
         }
