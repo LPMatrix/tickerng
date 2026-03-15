@@ -42,3 +42,15 @@ export const verificationToken = sqliteTable("verificationToken", {
   token: text("token").notNull(),
   expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
 });
+
+/** Persisted research reports (streamed content saved after completion). */
+export const report = sqliteTable("report", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  mode: text("mode").notNull(), // "discovery" | "verification"
+  query: text("query").notNull(),
+  content: text("content").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
+});

@@ -45,6 +45,14 @@ sqlite.exec(`
     token TEXT NOT NULL,
     expires INTEGER NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS report (
+    id TEXT PRIMARY KEY NOT NULL,
+    userId TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+    mode TEXT NOT NULL,
+    query TEXT NOT NULL,
+    content TEXT NOT NULL,
+    createdAt INTEGER NOT NULL
+  );
 `);
 
 export const db = drizzle(sqlite, { schema });
