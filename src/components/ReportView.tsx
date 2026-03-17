@@ -45,9 +45,6 @@ export function ReportView({ content, isStreaming, mode, onRunVerification }: Re
       {(hasBuySignal || hasSellSignal || hasHoldSignal) && (
         <div className="mb-6 flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3">
           {getRecommendationIcon()}
-          <span className="text-sm text-[var(--color-mute)]">
-            AI-generated recommendation detected
-          </span>
         </div>
       )}
 

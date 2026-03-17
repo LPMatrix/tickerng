@@ -64,11 +64,11 @@ export default function LandingPage() {
             <span>Now with AI-powered research reports</span>
           </div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[var(--color-ink)] md:text-6xl lg:text-7xl">
-            Research Nigerian stocks{" "}
-            <span className="text-[var(--color-accent)]">with confidence</span>
+            Full NGX stock research{" "}
+            <span className="text-[var(--color-accent)]">in under 60 seconds</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--color-mute)] md:text-xl">
-            EquiScan combines advanced AI with structured financial analysis to help you discover opportunities and verify investments on the Nigerian Exchange.
+            Your personal NGX analyst, on demand. Discovery and verification reports powered by AI — discover opportunities or deep-dive any ticker on the Nigerian Exchange.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link 
@@ -192,7 +192,7 @@ export default function LandingPage() {
                   "Full financial health assessment",
                   "Valuation analysis with key ratios",
                   "Risk factors and growth catalysts",
-                  "Executive summary with buy/hold/sell signals"
+                  "Executive summary with bull/bear case verdict"
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-[var(--color-ink)]">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
@@ -222,8 +222,8 @@ export default function LandingPage() {
                         <p className="text-xs text-[var(--color-mute)]">NGX: DANGCEM</p>
                       </div>
                       <div className="ml-auto text-right">
-                        <p className="font-medium text-[var(--color-accent)]">BUY</p>
-                        <p className="text-xs text-[var(--color-mute)]">Rating</p>
+                        <p className="font-medium text-[var(--color-accent)]">Bull case</p>
+                        <p className="text-xs text-[var(--color-mute)]">Verdict</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
@@ -393,6 +393,59 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <p className="mb-4 text-sm font-medium uppercase tracking-wider text-[var(--color-accent)]">
+              Pricing
+            </p>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-[var(--color-ink)] md:text-4xl">
+              Simple, transparent pricing
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--color-mute)]">
+              One plan for now. No hidden fees, no credit card required.
+            </p>
+          </div>
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg)] p-8 shadow-sm">
+              <div className="mb-6">
+                <h3 className="font-display text-xl font-semibold text-[var(--color-ink)]">Free</h3>
+                <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">₦0 <span className="text-base font-normal text-[var(--color-mute)]">/ month</span></p>
+              </div>
+              <ul className="space-y-3 text-[var(--color-ink)]">
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Unlimited Discovery reports — screen the whole NGX by theme or sector</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Unlimited Verification reports — full bull/bear analysis on any ticker</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Save reports and shareable links</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Export as PDF or copy as Markdown</span>
+                </li>
+              </ul>
+              <Link 
+                href="/signup" 
+                className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-base font-medium text-white hover:bg-[var(--color-accent)]/90 transition-colors"
+              >
+                Get started free
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <p className="mt-4 text-center text-sm text-[var(--color-mute)]">
+                We may introduce paid tiers later. Free users will keep a generous free tier.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="px-6 py-24">
         <div className="mx-auto max-w-4xl rounded-3xl bg-[var(--color-accent)] px-8 py-16 text-center md:px-16">
@@ -400,7 +453,7 @@ export default function LandingPage() {
             Start researching smarter today
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">
-            Join investors who use EquiScan to make better decisions on the Nigerian Exchange. Free tier available.
+            Join investors who use EquiScan to make better decisions on the Nigerian Exchange.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link 

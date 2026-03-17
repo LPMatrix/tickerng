@@ -7,7 +7,7 @@ import { ReportView } from "@/components/ReportView";
 import { ReportHistory } from "@/components/ReportHistory";
 import { Header } from "@/components/Header";
 import { ReportExport } from "@/components/ReportExport";
-import { Sparkles, FileText, BarChart3, Share2 } from "lucide-react";
+import { Sparkles, FileText, BarChart3 } from "lucide-react";
 
 /**
  * EquiScan Research Dashboard
@@ -21,7 +21,6 @@ export default function ResearchPage() {
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [reportsVersion, setReportsVersion] = useState(0);
   const [query, setQuery] = useState("");
-  const [shareMessage, setShareMessage] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async (inputQuery: string, options?: { modeOverride?: ResearchMode; includeMacroContext?: boolean }) => {
     const effectiveMode = options?.modeOverride ?? mode;
@@ -93,7 +92,6 @@ export default function ResearchPage() {
 
   const handleShare = useCallback(async () => {
     if (!currentReportId) return;
-    setShareMessage(null);
     try {
       const res = await fetch(`/api/reports/${currentReportId}/share`, {
         method: "POST",
@@ -103,11 +101,8 @@ export default function ResearchPage() {
       if (!res.ok) throw new Error("Failed to create link");
       const { url } = await res.json();
       await navigator.clipboard.writeText(url);
-      setShareMessage("Link copied!");
-      setTimeout(() => setShareMessage(null), 3000);
     } catch {
-      setShareMessage("Could not create link");
-      setTimeout(() => setShareMessage(null), 3000);
+      // Feedback is shown in ReportExport dropdown (linkCopied / error)
     }
   }, [currentReportId]);
 
@@ -188,24 +183,13 @@ export default function ResearchPage() {
                     
                     {/* Share & Export - Only show when report is complete */}
                     {!isRunning && (
-                      <div className="flex items-center gap-2">
-                        {currentReportId && (
-                          <button
-                            type="button"
-                            onClick={handleShare}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-bg)] transition-colors"
-                            title="Copy read-only link"
-                          >
-                            <Share2 className="h-4 w-4" />
-                            {shareMessage ?? "Share"}
-                          </button>
-                        )}
-                        <ReportExport 
-                          content={report} 
-                          query={query} 
-                          mode={mode} 
-                        />
-                      </div>
+                      <ReportExport
+                        content={report}
+                        query={query}
+                        mode={mode}
+                        reportId={currentReportId}
+                        onCopyShareLink={handleShare}
+                      />
                     )}
                   </div>
                 </div>
