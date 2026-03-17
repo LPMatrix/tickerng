@@ -489,6 +489,12 @@ export default function LandingPage() {
               © {new Date().getFullYear()} EquiScan. Research tool for the Nigerian Exchange.
             </p>
             <div className="flex items-center gap-6">
+              <Link href="/privacy" className="text-sm text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-sm text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors">
+                Terms
+              </Link>
               <Link href="/signin" className="text-sm text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors">
                 Sign in
               </Link>

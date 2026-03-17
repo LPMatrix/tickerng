@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
@@ -15,9 +15,28 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://equiscan.app";
+
 export const metadata: Metadata = {
-  title: "EquiScan — NGX Research Tool",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "EquiScan — NGX Research Tool",
+    template: "%s | EquiScan",
+  },
   description: "Fast, structured stock research on the Nigerian Exchange. Discovery and verification reports powered by AI.",
+  openGraph: {
+    type: "website",
+    locale: "en",
+    siteName: "EquiScan",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

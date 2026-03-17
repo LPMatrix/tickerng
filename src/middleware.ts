@@ -6,7 +6,7 @@ export default auth((req) => {
   const isAuthRoute = path.startsWith("/signin") || path.startsWith("/signup");
   const isApiAuth = path.startsWith("/api/auth");
   const isApiShare = path.startsWith("/api/share/");
-  const isPublicRoute = path === "/" || path.startsWith("/_next") || path.startsWith("/favicon") || path.startsWith("/r/");
+  const isPublicRoute = path === "/" || path.startsWith("/_next") || path.startsWith("/favicon") || path.startsWith("/r/") || path === "/privacy" || path === "/terms";
   const isAppRoute = path.startsWith("/research");
 
   if (isApiAuth || isApiShare) return;
