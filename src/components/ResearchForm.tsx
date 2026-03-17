@@ -6,12 +6,13 @@ import type { ResearchMode } from "./ModeSelector";
 
 interface ResearchFormProps {
   mode: ResearchMode;
-  onSubmit: (query: string) => void;
+  onSubmit: (query: string, options?: { includeMacroContext?: boolean }) => void;
   isRunning: boolean;
 }
 
 export function ResearchForm({ mode, onSubmit, isRunning }: ResearchFormProps) {
   const [value, setValue] = useState("");
+  const [includeMacroContext, setIncludeMacroContext] = useState(true);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
   const isDiscovery = mode === "discovery";
@@ -40,7 +41,7 @@ export function ResearchForm({ mode, onSubmit, isRunning }: ResearchFormProps) {
     e.preventDefault();
     const trimmed = value.trim();
     if (!trimmed || isRunning) return;
-    onSubmit(trimmed);
+    onSubmit(trimmed, isDiscovery ? { includeMacroContext } : undefined);
   };
 
   // Quick suggestions for discovery mode
@@ -155,6 +156,21 @@ export function ResearchForm({ mode, onSubmit, isRunning }: ResearchFormProps) {
           </div>
         </div>
       </div>
+
+      {/* Macro context toggle (discovery only) */}
+      {isDiscovery && !isRunning && (
+        <label className="mt-3 flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={includeMacroContext}
+            onChange={(e) => setIncludeMacroContext(e.target.checked)}
+            className="h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
+          />
+          <span className="text-sm text-[var(--color-mute)]">
+            Include macro context (CBN rate, inflation, FX)
+          </span>
+        </label>
+      )}
 
       {/* Quick Suggestions */}
       {!isRunning && (

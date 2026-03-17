@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const mode = (body.mode === "discovery" ? "discovery" : "verification") as ResearchMode;
     const query = typeof body.query === "string" ? body.query.trim() : "";
+    const includeMacroContext = mode === "discovery" && body.includeMacroContext !== false;
 
     if (!query) {
       return NextResponse.json(
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const anthropic = new Anthropic({ apiKey });
-    const systemPrompt = getSystemPrompt(mode);
+    const systemPrompt = getSystemPrompt(mode, { includeMacroContext });
     const userMessage = getUserMessage(mode, query);
 
     const stream = anthropic.messages.stream({

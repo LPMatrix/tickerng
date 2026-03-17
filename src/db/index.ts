@@ -53,6 +53,14 @@ sqlite.exec(`
     content TEXT NOT NULL,
     createdAt INTEGER NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS reportShare (
+    id TEXT PRIMARY KEY NOT NULL,
+    reportId TEXT NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expiresAt INTEGER,
+    revoked INTEGER NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL
+  );
 `);
 
 export const db = drizzle(sqlite, { schema });

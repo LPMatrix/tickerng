@@ -47,4 +47,5 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
 - Auth, SQLite, and report persistence (saved reports + Recent list below header)
 - Clean, readable UI — desktop and mobile
 
-See **[ROADMAP.md](./ROADMAP.md)** for v2 plans (drill-down, confidence UI, export, share link, macro context).
+See **[ROADMAP.md](./ROADMAP.md)** for v2 plans (drill-down, confidence UI, export, share link, macro context).  
+See **[LAUNCH_STRATEGY.md](./LAUNCH_STRATEGY.md)** for launch strategy (ORB channels, five-phase launch, Product Hunt, checklists).

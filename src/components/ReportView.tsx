@@ -1,20 +1,27 @@
 "use client";
 
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, AlertCircle, FileSearch } from "lucide-react";
+import type { ResearchMode } from "./ModeSelector";
 
 interface ReportViewProps {
   content: string;
   isStreaming?: boolean;
+  /** When set, discovery shortlist items (Name (TICKER)) become clickable to run verification. */
+  mode?: ResearchMode;
+  onRunVerification?: (ticker: string) => void;
 }
 
 /**
  * Enhanced Report View with improved typography,
  * structured layout, and visual indicators for key data.
  */
-export function ReportView({ content, isStreaming }: ReportViewProps) {
+export function ReportView({ content, isStreaming, mode, onRunVerification }: ReportViewProps) {
   if (!content.trim()) return null;
+
+  const canDrillDown = mode === "discovery" && !!onRunVerification && !isStreaming;
 
   // Detect recommendation indicators in content
   const hasBuySignal = /\b(BUY|STRONG BUY)\b/i.test(content);
@@ -65,11 +72,35 @@ export function ReportView({ content, isStreaming }: ReportViewProps) {
                 {children}
               </h3>
             ),
-            p: ({ children }) => (
-              <p className="mb-4 leading-relaxed text-[var(--color-ink)]">
-                {children}
-              </p>
-            ),
+            p: ({ children }) => {
+              const text = React.Children.toArray(children).join("");
+              const confidenceMatch = text.match(/^\s*\[(High|Medium|Low)\]\s*[—\-]\s*(.+)$/);
+              if (confidenceMatch) {
+                const [, level, reason] = confidenceMatch;
+                const badgeClass =
+                  level === "High"
+                    ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30"
+                    : level === "Medium"
+                      ? "bg-amber-500/15 text-amber-700 border-amber-500/30"
+                      : "bg-red-500/15 text-red-700 border-red-500/30";
+                return (
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
+                      title="Source confidence"
+                    >
+                      {level}
+                    </span>
+                    <span className="text-sm text-[var(--color-mute)]">{reason.trim()}</span>
+                  </div>
+                );
+              }
+              return (
+                <p className="mb-4 leading-relaxed text-[var(--color-ink)]">
+                  {children}
+                </p>
+              );
+            },
             ul: ({ children }) => (
               <ul className="mb-4 space-y-2 pl-5">
                 {children}
@@ -132,11 +163,32 @@ export function ReportView({ content, isStreaming }: ReportViewProps) {
             hr: () => (
               <hr className="my-6 border-[var(--color-border)]" />
             ),
-            strong: ({ children }) => (
-              <strong className="font-semibold text-[var(--color-ink)]">
-                {children}
-              </strong>
-            ),
+            strong: ({ children }) => {
+              const text = typeof children === "string" ? children : String(React.Children.toArray(children).join(""));
+              const tickerMatch = text.match(/\(([A-Z0-9]{2,8})\)\s*$/);
+              const ticker = tickerMatch?.[1];
+              if (canDrillDown && ticker) {
+                return (
+                  <strong className="inline-flex flex-wrap items-center gap-1.5 font-semibold text-[var(--color-ink)]">
+                    <span>{text}</span>
+                    <button
+                      type="button"
+                      onClick={() => onRunVerification?.(ticker)}
+                      className="inline-flex items-center gap-1 rounded-md border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 px-2 py-0.5 text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                      title={`Run verification report for ${ticker}`}
+                    >
+                      <FileSearch className="h-3 w-3" />
+                      Verify
+                    </button>
+                  </strong>
+                );
+              }
+              return (
+                <strong className="font-semibold text-[var(--color-ink)]">
+                  {children}
+                </strong>
+              );
+            },
             a: ({ href, children }) => (
               <a 
                 href={href} 

@@ -6,7 +6,8 @@ import { ResearchForm } from "@/components/ResearchForm";
 import { ReportView } from "@/components/ReportView";
 import { ReportHistory } from "@/components/ReportHistory";
 import { Header } from "@/components/Header";
-import { Sparkles, FileText, Clock, BarChart3 } from "lucide-react";
+import { ReportExport } from "@/components/ReportExport";
+import { Sparkles, FileText, BarChart3, Share2 } from "lucide-react";
 
 /**
  * EquiScan Research Dashboard
@@ -20,8 +21,11 @@ export default function ResearchPage() {
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [reportsVersion, setReportsVersion] = useState(0);
   const [query, setQuery] = useState("");
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(async (inputQuery: string) => {
+  const handleSubmit = useCallback(async (inputQuery: string, options?: { modeOverride?: ResearchMode; includeMacroContext?: boolean }) => {
+    const effectiveMode = options?.modeOverride ?? mode;
+    setMode(effectiveMode);
     setQuery(inputQuery);
     setReport("");
     setCurrentReportId(null);
@@ -30,7 +34,11 @@ export default function ResearchPage() {
       const res = await fetch("/api/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, query: inputQuery }),
+        body: JSON.stringify({
+          mode: effectiveMode,
+          query: inputQuery,
+          includeMacroContext: options?.includeMacroContext ?? true,
+        }),
       });
       if (!res.ok) throw new Error("Research request failed");
       const reader = res.body?.getReader();
@@ -51,7 +59,7 @@ export default function ResearchPage() {
         const saveRes = await fetch("/api/reports", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode, query: inputQuery, content: acc }),
+          body: JSON.stringify({ mode: effectiveMode, query: inputQuery, content: acc }),
         });
         if (saveRes.ok) {
           const { id } = await saveRes.json();
@@ -82,6 +90,26 @@ export default function ResearchPage() {
   }, []);
 
   const hasReport = report.trim().length > 0;
+
+  const handleShare = useCallback(async () => {
+    if (!currentReportId) return;
+    setShareMessage(null);
+    try {
+      const res = await fetch(`/api/reports/${currentReportId}/share`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) throw new Error("Failed to create link");
+      const { url } = await res.json();
+      await navigator.clipboard.writeText(url);
+      setShareMessage("Link copied!");
+      setTimeout(() => setShareMessage(null), 3000);
+    } catch {
+      setShareMessage("Could not create link");
+      setTimeout(() => setShareMessage(null), 3000);
+    }
+  }, [currentReportId]);
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-bg)]">
@@ -132,12 +160,12 @@ export default function ResearchPage() {
             {hasReport ? (
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
                 {/* Report Header */}
-                <div className="border-b border-[var(--color-border)] px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--color-border)] px-6 py-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
                       <FileText className="h-5 w-5" />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0">
                       <h2 className="font-display text-lg font-semibold text-[var(--color-ink)]">
                         {mode === "verification" ? "Verification Report" : "Discovery Results"}
                       </h2>
@@ -145,6 +173,9 @@ export default function ResearchPage() {
                         {query || "Research analysis"}
                       </p>
                     </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     {isRunning && (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent)]/10 px-3 py-1 text-xs font-medium text-[var(--color-accent)]">
                         <span className="relative flex h-2 w-2">
@@ -154,12 +185,39 @@ export default function ResearchPage() {
                         Generating
                       </span>
                     )}
+                    
+                    {/* Share & Export - Only show when report is complete */}
+                    {!isRunning && (
+                      <div className="flex items-center gap-2">
+                        {currentReportId && (
+                          <button
+                            type="button"
+                            onClick={handleShare}
+                            className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-bg)] transition-colors"
+                            title="Copy read-only link"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            {shareMessage ?? "Share"}
+                          </button>
+                        )}
+                        <ReportExport 
+                          content={report} 
+                          query={query} 
+                          mode={mode} 
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 
                 {/* Report Content */}
                 <div className="p-6">
-                  <ReportView content={report} isStreaming={isRunning} />
+                  <ReportView
+                    content={report}
+                    isStreaming={isRunning}
+                    mode={mode}
+                    onRunVerification={(ticker) => handleSubmit(ticker, { modeOverride: "verification" })}
+                  />
                 </div>
               </div>
             ) : (
@@ -176,10 +234,6 @@ export default function ResearchPage() {
                     ? "Enter a stock ticker like GTCO or DANGCEM to get a comprehensive analysis report."
                     : "Ask a question like 'best dividend stocks' or 'banking sector opportunities' to discover potential investments."}
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[var(--color-mute)]">
-                  <Clock className="h-4 w-4" />
-                  <span>Reports are saved automatically</span>
-                </div>
               </div>
             )}
           </div>

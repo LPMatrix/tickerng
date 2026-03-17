@@ -27,7 +27,9 @@ Rules you must follow:
 - Primary sources to favour when searching: NGX Group (ngxgroup.com), Nairametrics, Proshare Nigeria, BusinessDay Nigeria, CBN website for macro data.
 `.trim();
 
-export function getSystemPrompt(mode: ResearchMode): string {
+export type PromptOptions = { includeMacroContext?: boolean };
+
+export function getSystemPrompt(mode: ResearchMode, options?: PromptOptions): string {
   if (mode === "verification") {
     return `${CORE_RULES}
 
@@ -70,12 +72,9 @@ Respond with only the report in Markdown. No preamble or meta-commentary.`;
   }
 
   // Discovery mode
-  return `${CORE_RULES}
-
-You are in DISCOVERY mode. The user will supply a natural-language query (e.g. "best banking stocks right now", "NGX stocks with strong dividend"). Your task is to produce a short discovery report with the following structure. Use web search to find current NGX data, sector momentum, and macro context.
-
-## Required report structure (use these exact section headers)
-
+  const includeMacro = options?.includeMacroContext !== false;
+  const macroSection = includeMacro
+    ? `
 ### 1. Macro Context
 Required — always include this section. Cover:
 - CBN Monetary Policy Rate (current)
@@ -85,6 +84,20 @@ Required — always include this section. Cover:
 - [Confidence — reason]
 
 ### 2. Shortlist
+`
+    : `
+### 1. Shortlist
+`;
+  const shortlistNum = includeMacro ? "2" : "1";
+  const sectorNum = includeMacro ? "3" : "2";
+  const nextStepNum = includeMacro ? "4" : "3";
+
+  return `${CORE_RULES}
+
+You are in DISCOVERY mode. The user will supply a natural-language query (e.g. "best banking stocks right now", "NGX stocks with strong dividend"). Your task is to produce a short discovery report with the following structure. Use web search to find current NGX data and sector momentum.${includeMacro ? " Include macro context (CBN, inflation, NGX index) as the first section." : " Do not include a separate Macro Context section."}
+
+## Required report structure (use these exact section headers)
+${macroSection}
 List exactly 3–5 NGX stocks. Only include stocks with average daily volume above 10,000 shares/day — if a compelling stock has uncertain liquidity data, include it but flag the uncertainty explicitly.
 
 For each stock use this format:
@@ -102,12 +115,12 @@ Investment Grade definitions:
 
 - [Confidence — reason, noting per-stock data quality where it varies]
 
-### 3. Sector Summary Table
+### ${sectorNum}. Sector Summary Table
 A markdown table with columns: Ticker | Sub-sector | Investment Grade | Key Metric | Risk Profile
 Include all shortlisted stocks.
 - [Confidence — reason]
 
-### 4. Next Step
+### ${nextStepNum}. Next Step
 One line prompting the user to run a verification report on any shortlisted stock. No confidence marker required for this section.
 
 Respond with only the report in Markdown. No preamble or meta-commentary.`;

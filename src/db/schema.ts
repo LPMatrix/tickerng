@@ -54,3 +54,15 @@ export const report = sqliteTable("report", {
   content: text("content").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
 });
+
+/** Share tokens for read-only report links. Token is secret; optional expiry and revocable. */
+export const reportShare = sqliteTable("reportShare", {
+  id: text("id").primaryKey(),
+  reportId: text("reportId")
+    .notNull()
+    .references(() => report.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: integer("expiresAt", { mode: "timestamp_ms" }), // null = no expiry
+  revoked: integer("revoked", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
+});
