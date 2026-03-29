@@ -22,7 +22,10 @@ export default function ResearchPage() {
   const [reportsVersion, setReportsVersion] = useState(0);
   const [query, setQuery] = useState("");
 
-  const handleSubmit = useCallback(async (inputQuery: string, options?: { modeOverride?: ResearchMode; includeMacroContext?: boolean }) => {
+  const handleSubmit = useCallback(async (
+    inputQuery: string,
+    options?: { modeOverride?: ResearchMode; includeMacroContext?: boolean }
+  ) => {
     const effectiveMode = options?.modeOverride ?? mode;
     setMode(effectiveMode);
     setQuery(inputQuery);
@@ -151,8 +154,8 @@ export default function ResearchPage() {
               />
             </section>
 
-            {/* Report Display */}
-            {hasReport ? (
+            {/* Report Display — show panel while running so v3 specialist phase isn’t an empty state */}
+            {hasReport || isRunning ? (
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
                 {/* Report Header */}
                 <div className="flex items-center justify-between gap-4 border-b border-[var(--color-border)] px-6 py-4">
@@ -196,12 +199,27 @@ export default function ResearchPage() {
                 
                 {/* Report Content */}
                 <div className="p-6">
-                  <ReportView
-                    content={report}
-                    isStreaming={isRunning}
-                    mode={mode}
-                    onRunVerification={(ticker) => handleSubmit(ticker, { modeOverride: "verification" })}
-                  />
+                  {isRunning && !report.trim() ? (
+                    <div className="space-y-3 text-[var(--color-mute)]">
+                      <p className="text-sm font-medium text-[var(--color-ink)]">
+                        Running specialist analysts…
+                      </p>
+                      <p className="text-sm">
+                        Four parallel researchers (fundamentals, news, macro, sentiment) are gathering
+                        data. When they finish, your report will stream here. This usually takes 30–90
+                        seconds before text appears.
+                      </p>
+                    </div>
+                  ) : (
+                    <ReportView
+                      content={report}
+                      isStreaming={isRunning}
+                      mode={mode}
+                      onRunVerification={(ticker) =>
+                        handleSubmit(ticker, { modeOverride: "verification" })
+                      }
+                    />
+                  )}
                 </div>
               </div>
             ) : (

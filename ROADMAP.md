@@ -1,44 +1,20 @@
 # EquiScan roadmap
 
-## v1 (current)
 
-- Mode toggle: Discovery / Verification
-- Text input per mode (ticker or natural language)
-- Streamed report from Claude with web search
-- Auth (sign up / sign in) and SQLite-backed user storage
-- Report persistence: reports saved to SQLite and listed in Recent reports
-- Clean, readable UI — desktop and mobile
+## v3 (shipped) — Specialist agents + synthesis (TradingAgents-style)
 
----
+**Verification (default):** Four parallel `messages.create` calls with web search — **Fundamentals**, **News**, **Macro**, **Sentiment** — each `max_uses: 4`, `max_tokens: 4096`. Then one **synthesis** `messages.stream` with **no** web search; output matches the same six-section Markdown report as v2 (through Verdict).
 
-## v2 (planned)
+**Code:** `src/lib/specialists.ts`, `src/app/api/research/route.ts`. Response header `X-EquiScan-Pipeline: specialists-v3` for verification, `discovery` for discovery.
 
-### Discovery drill-down (F-07) — implemented
+**Discovery:** One streamed call + web search (macro checkbox unchanged).
 
-- Each discovery shortlist item is a link that runs a full verification report for that stock.
-- No copy-paste of ticker; one click from shortlist to full report.
-- **Done:** Shortlist entries matching `**Name (TICKER)**` show a "Verify" button; clicking runs verification for that ticker.
+**UI:** “Running specialist analysts…” until synthesis streams; then `ReportView` as before.
 
-### Data confidence in UI (F-08) — implemented
-
-- Prompts already ask for `[High]` / `[Medium]` / `[Low]` per section.
-- Surface these in the UI (e.g. badges or labels next to section headings) so users see source confidence at a glance.
-- **Done:** Paragraphs that are exactly `[High|Medium|Low] — reason` render as coloured confidence badges + reason text.
-
-### Macro context block (F-10) — implemented
-
-- Optional section in discovery reports: CBN rate, inflation, FX (sourced from CBN / recent news).
-- Auto-appended or toggleable in discovery mode.
-- **Done:** Discovery form has "Include macro context (CBN rate, inflation, FX)" checkbox (default on); prompt omits Macro Context section when unchecked.
-
-### Peer share link (F-12) — implemented
-
-- Generate a read-only URL for a specific report (e.g. `/r/[token]`).
-- Share with peers without giving account access; token can be revocable or expiry-based.
-- **Done:** Share button on report creates link; public `/r/[token]` page; optional expiry via `expiresInDays`; `DELETE /api/share/[token]` to revoke.
+**Next:** Per-specialist logging/cache, SSE progress, discovery parallelization, data API on Fundamentals.
 
 ---
 
 ## Later
 
-- Future: optional NGX API or afx.kwayisi.org integration for richer data when justified.
+- Optional NGX API or afx.kwayisi.org integration for richer data when justified (can feed **Fundamentals** agent first).

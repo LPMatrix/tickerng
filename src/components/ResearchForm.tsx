@@ -29,7 +29,8 @@ export function ResearchForm({ mode, onSubmit, isRunning }: ResearchFormProps) {
   
   const hints = {
     discovery: "Ask natural language questions to discover stocks matching your investment criteria.",
-    verification: "Enter a ticker symbol to generate a comprehensive research report with financials, valuation, and recommendation.",
+    verification:
+      "Enter a ticker. We run four parallel specialists (fundamentals, news, macro, sentiment), then synthesize one report.",
   };
 
   useEffect(() => {
