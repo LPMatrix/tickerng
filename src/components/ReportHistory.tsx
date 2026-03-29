@@ -10,7 +10,8 @@ import {
   History,
   Download,
   Copy,
-  Check
+  Check,
+  Trash2,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -26,15 +27,18 @@ export function ReportHistory({
   onSelectReport,
   currentReportId,
   reportsVersion = 0,
+  onReportDeleted,
 }: {
   onSelectReport: (id: string) => void;
   currentReportId: string | null;
   reportsVersion?: number;
+  onReportDeleted?: (id: string) => void;
 }) {
   const [list, setList] = useState<ReportSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -170,6 +174,32 @@ export function ReportHistory({
       alert("Failed to export PDF. Please try again.");
     } finally {
       setExportingId(null);
+    }
+  };
+
+  const handleDelete = async (report: ReportSummary, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (deletingId === report.id) return;
+    if (
+      !window.confirm(
+        "Delete this report? Shared links will stop working. This cannot be undone."
+      )
+    ) {
+      return;
+    }
+    setDeletingId(report.id);
+    try {
+      const res = await fetch(`/api/reports/${report.id}`, { method: "DELETE" });
+      if (!res.ok && res.status !== 404) {
+        throw new Error("Delete failed");
+      }
+      setList((prev) => prev.filter((r) => r.id !== report.id));
+      onReportDeleted?.(report.id);
+    } catch (err) {
+      console.error("Failed to delete report:", err);
+      alert("Could not delete the report. Try again.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -316,7 +346,7 @@ export function ReportHistory({
                   </button>
 
                   {/* Action Buttons */}
-                  <div className="mt-2 flex items-center justify-end gap-1 border-t border-[var(--color-border)] pt-2 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="mt-2 flex flex-wrap items-center justify-end gap-1 border-t border-[var(--color-border)] pt-2 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
                     {/* Copy Button */}
                     <button
                       type="button"
@@ -351,6 +381,21 @@ export function ReportHistory({
                         <Download className="h-3.5 w-3.5" />
                       )}
                       <span>{exportingId === report.id ? "Exporting..." : "PDF"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(report, e)}
+                      disabled={deletingId === report.id}
+                      className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-[var(--color-mute)] transition-colors hover:bg-red-500/10 hover:text-red-600 disabled:opacity-50"
+                      title="Delete report"
+                    >
+                      {deletingId === report.id ? (
+                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--color-border-strong)] border-t-red-500" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                      <span>{deletingId === report.id ? "…" : "Delete"}</span>
                     </button>
                   </div>
                 </div>

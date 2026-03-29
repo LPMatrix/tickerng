@@ -7,7 +7,7 @@ Rules you must follow:
 
 - Output format: Use Markdown section headers (##, ###), short tables for metrics where appropriate, and brief prose for qualitative commentary. No bullet-heavy walls; structure for quick scanning.
 
-- No hallucination: If a data point cannot be found from search results, say so explicitly in that section (e.g. "Data not found" or "No recent source available"). Never fabricate EPS, P/E, revenue, or any financial figure.
+- No hallucination: If a data point cannot be found in the provided excerpts, say so explicitly in that section (e.g. "Data not found" or "No recent source available"). Never fabricate EPS, P/E, revenue, or any financial figure.
 
 - Confidence signalling: At the end of each major section (except "Next Step"), append a confidence marker on its own line in this exact format:
   [High] — reason
@@ -24,7 +24,7 @@ Rules you must follow:
 
 - Analyst scepticism: NGX analyst coverage is sparse and often lagged. Treat consensus ratings as weak signals. If no recent analyst ratings are found, state "No recent analyst consensus found" rather than inferring.
 
-- Primary sources to favour when searching: NGX Group (ngxgroup.com), Nairametrics, Proshare Nigeria, BusinessDay Nigeria, CBN website for macro data.
+- Primary sources to favour in excerpts: NGX Group (ngxgroup.com), Nairametrics, Proshare Nigeria, BusinessDay Nigeria, CBN website for macro data.
 `.trim();
 
 export type PromptOptions = { includeMacroContext?: boolean };
@@ -33,7 +33,7 @@ export function getSystemPrompt(mode: ResearchMode, options?: PromptOptions): st
   if (mode === "verification") {
     return `${CORE_RULES}
 
-You are in VERIFICATION mode. The user will supply an NGX ticker symbol (e.g. GTCO, DANGCEM, MTNN). Your task is to produce a single, structured verification report with the following sections. Use web search to find current, publicly available data.
+You are in VERIFICATION mode. The user will supply an NGX ticker symbol (e.g. GTCO, DANGCEM, MTNN). Your task is to produce a single, structured verification report with the following sections. Use only the web search excerpts provided in the user message for factual claims.
 
 ## Required report structure (use these exact section headers)
 
@@ -94,7 +94,7 @@ Required — always include this section. Cover:
 
   return `${CORE_RULES}
 
-You are in DISCOVERY mode. The user will supply a natural-language query (e.g. "best banking stocks right now", "NGX stocks with strong dividend"). Your task is to produce a short discovery report with the following structure. Use web search to find current NGX data and sector momentum.${includeMacro ? " Include macro context (CBN, inflation, NGX index) as the first section." : " Do not include a separate Macro Context section."}
+You are in DISCOVERY mode. The user will supply a natural-language query (e.g. "best banking stocks right now", "NGX stocks with strong dividend"). Your task is to produce a short discovery report with the following structure. Use only the web search excerpts in the user message for factual claims about NGX data and sector momentum.${includeMacro ? " Include macro context (CBN, inflation, NGX index) as the first section." : " Do not include a separate Macro Context section."}
 
 ## Required report structure (use these exact section headers)
 ${macroSection}
@@ -129,7 +129,7 @@ Respond with only the report in Markdown. No preamble or meta-commentary.`;
 export function getUserMessage(mode: ResearchMode, query: string): string {
   const q = query.trim().replace(/[^\w\s]/g, "").trim();
   if (mode === "verification") {
-    return `Produce a verification report for the following NGX ticker: ${q.toUpperCase()}. Use web search to find current data and follow the required section structure.`;
+    return `Produce a verification report for the following NGX ticker: ${q.toUpperCase()}. Follow the required section structure using the excerpts below.`;
   }
-  return `Produce a discovery report for the following query: "${q}". Use web search to find current NGX and market data. Follow the required section structure and return a shortlist of 3–5 stocks with brief rationale.`;
+  return `Produce a discovery report for the following query: "${q}". Follow the required section structure and return a shortlist of 3–5 stocks with brief rationale, using the excerpts below.`;
 }

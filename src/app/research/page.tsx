@@ -251,6 +251,13 @@ export default function ResearchPage() {
               reportsVersion={reportsVersion}
               onSelectReport={handleSelectReport}
               currentReportId={currentReportId}
+              onReportDeleted={(id) => {
+                if (currentReportId === id) {
+                  setCurrentReportId(null);
+                  setReport("");
+                  setQuery("");
+                }
+              }}
             />
           </div>
         </aside>

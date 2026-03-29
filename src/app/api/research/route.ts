@@ -12,12 +12,16 @@ import {
   getSynthesisSystemPrompt,
   getSynthesisUserMessage,
 } from "@/lib/specialists";
+import {
+  tavilySearchToMarkdown,
+  buildSpecialistWebContext,
+  discoveryTavilyQueries,
+  discoveryTavilyOptions,
+} from "@/lib/tavily";
 
 const MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 8192;
-const WEB_SEARCH_MAX_USES = 10;
 const SPECIALIST_MAX_TOKENS = 4096;
-const SPECIALIST_WEB_SEARCH_MAX_USES = 4;
 
 function extractMessageText(message: Message): string {
   return message.content
@@ -33,6 +37,7 @@ function normalizeTicker(raw: string): string {
 
 async function runSpecialist(
   anthropic: Anthropic,
+  tavilyApiKey: string,
   key: SpecialistKey,
   ticker: string
 ): Promise<string> {
@@ -45,20 +50,13 @@ async function runSpecialist(
           ? "Macro"
           : "Sentiment";
   try {
+    const searchMd = await buildSpecialistWebContext(tavilyApiKey, ticker, key);
+    const userContent = `${getSpecialistUserMessage(ticker, key)}\n\n${searchMd}`;
     const msg = await anthropic.messages.create({
       model: MODEL,
       max_tokens: SPECIALIST_MAX_TOKENS,
       system: getSpecialistSystemPrompt(key),
-      messages: [
-        { role: "user", content: getSpecialistUserMessage(ticker, key) },
-      ],
-      tools: [
-        {
-          type: "web_search_20250305",
-          name: "web_search",
-          max_uses: SPECIALIST_WEB_SEARCH_MAX_USES,
-        },
-      ] as never,
+      messages: [{ role: "user", content: userContent }],
     });
     const text = extractMessageText(msg);
     if (!text) {
@@ -81,6 +79,14 @@ export async function POST(request: NextRequest) {
   if (!apiKey) {
     return NextResponse.json(
       { error: "ANTHROPIC_API_KEY is not configured" },
+      { status: 503 }
+    );
+  }
+
+  const tavilyApiKey = process.env.TAVILY_API_KEY?.trim();
+  if (!tavilyApiKey) {
+    return NextResponse.json(
+      { error: "TAVILY_API_KEY is not configured" },
       { status: 503 }
     );
   }
@@ -110,7 +116,7 @@ export async function POST(request: NextRequest) {
       }
 
       const results = await Promise.all(
-        SPECIALIST_KEYS.map((key) => runSpecialist(anthropic, key, ticker))
+        SPECIALIST_KEYS.map((key) => runSpecialist(anthropic, tavilyApiKey, key, ticker))
       );
       const memos = Object.fromEntries(
         SPECIALIST_KEYS.map((k, i) => [k, results[i]])
@@ -160,16 +166,24 @@ export async function POST(request: NextRequest) {
     }
 
     const systemPrompt = getSystemPrompt(mode, { includeMacroContext });
-    const userMessage = getUserMessage(mode, query);
+    const baseUserMessage = getUserMessage(mode, query);
+    const discoveryQueries = discoveryTavilyQueries(query, includeMacroContext);
+    const discoveryBlocks = await Promise.all(
+      discoveryQueries.map((q, i) =>
+        tavilySearchToMarkdown(tavilyApiKey, q, {
+          ...discoveryTavilyOptions(i),
+          sectionHeading:
+            i === 0 ? "Web search: your query (NGX-focused)" : "Web search: macro & NGX market",
+        })
+      )
+    );
+    const userMessage = `${baseUserMessage}\n\n${discoveryBlocks.join("\n\n")}`;
 
     const stream = anthropic.messages.stream({
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
-      tools: [
-        { type: "web_search_20250305", name: "web_search", max_uses: WEB_SEARCH_MAX_USES },
-      ] as never,
     });
 
     const encoder = new TextEncoder();

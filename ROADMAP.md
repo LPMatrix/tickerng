@@ -3,11 +3,11 @@
 
 ## v3 (shipped) — Specialist agents + synthesis (TradingAgents-style)
 
-**Verification (default):** Four parallel `messages.create` calls with web search — **Fundamentals**, **News**, **Macro**, **Sentiment** — each `max_uses: 4`, `max_tokens: 4096`. Then one **synthesis** `messages.stream` with **no** web search; output matches the same six-section Markdown report as v2 (through Verdict).
+**Verification (default):** Four parallel `messages.create` calls — **Fundamentals**, **News**, **Macro**, **Sentiment** — each with **Tavily** excerpts in the user message, `max_tokens: 4096`. Then one **synthesis** `messages.stream` (no search); output matches the same six-section Markdown report as v2 (through Verdict).
 
-**Code:** `src/lib/specialists.ts`, `src/app/api/research/route.ts`. Response header `X-EquiScan-Pipeline: specialists-v3` for verification, `discovery` for discovery.
+**Code:** `src/lib/specialists.ts`, `src/lib/tavily.ts`, `src/app/api/research/route.ts`. Response header `X-EquiScan-Pipeline: specialists-v3` for verification, `discovery` for discovery.
 
-**Discovery:** One streamed call + web search (macro checkbox unchanged).
+**Discovery:** Tavily (1–2 queries) + one streamed Claude call, no Anthropic web-search tool (macro checkbox unchanged).
 
 **UI:** “Running specialist analysts…” until synthesis streams; then `ReportView` as before.
 

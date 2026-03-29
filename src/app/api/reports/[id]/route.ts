@@ -33,6 +33,26 @@ export async function GET(
   return NextResponse.json(row);
 }
 
+/** DELETE: remove a report owned by the current user (share rows cascade). */
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { id } = await params;
+  const result = await db
+    .delete(reportTable)
+    .where(and(eq(reportTable.id, id), eq(reportTable.userId, session.user.id)))
+    .returning({ id: reportTable.id });
+  if (result.length === 0) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  return new NextResponse(null, { status: 204 });
+}
+
 /** POST: create a read-only share link for this report (owner only). Body: { expiresInDays?: number } */
 export async function POST(
   request: NextRequest,

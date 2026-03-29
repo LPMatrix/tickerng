@@ -1,6 +1,6 @@
 /**
- * v3 verification pipeline: parallel specialist agents + synthesis (no web search).
- * Each specialist runs a focused web search; synthesis merges into the final report shape.
+ * v3 verification pipeline: parallel specialist agents + synthesis.
+ * Each specialist receives Tavily web excerpts in the user message; synthesis merges memos.
  */
 
 export const SPECIALIST_KEYS = ["fundamentals", "news", "macro", "sentiment"] as const;
@@ -10,7 +10,8 @@ const SPECIALIST_CORE = `
 You are an NGX (Nigerian Exchange) research specialist. Output Markdown only — no preamble or meta-commentary.
 
 Rules:
-- Use web search for current, publicly available data. Prefer ngxgroup.com, Nairametrics, Proshare Nigeria, BusinessDay Nigeria, CBN for macro.
+- Use only the web search excerpts in the user message below for factual claims (URLs/snippets). Prefer ngxgroup.com, Nairametrics, Proshare Nigeria, BusinessDay Nigeria, CBN when present in excerpts.
+- The ticker is an **NGX (Nigerian Exchange)** listing. If a snippet clearly refers to a different country or exchange (e.g. US/EU homonym symbol), ignore it unless it explicitly ties to Nigeria or NGX.
 - Never fabricate figures. If data is missing, say "Data not found" for that item.
 - Prefer sources from the last 90 days; note if older.
 - At the very end of your output, on its own line, include exactly one confidence marker:
@@ -82,7 +83,7 @@ export function getSpecialistUserMessage(ticker: string, key: SpecialistKey): st
     macro: "Macro & market context",
     sentiment: "Analyst & sentiment",
   };
-  return `Ticker: ${t}\n\nProduce the ${labels[key]} specialist memo for this NGX stock. Use web search. End with a single [High|Medium|Low] — reason line.`;
+  return `Ticker: ${t}\n\nProduce the ${labels[key]} specialist memo for this NGX stock using the excerpts below. End with a single [High|Medium|Low] — reason line.`;
 }
 
 const SYNTHESIS_RULES = `

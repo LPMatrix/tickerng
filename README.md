@@ -6,7 +6,7 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
 
 - **Framework:** Next.js (App Router)
 - **Styling:** Tailwind CSS
-- **AI:** Claude API (to be wired in)
+- **AI:** Claude (Anthropic) + Tavily Search for research context
 - **Deploy:** Vercel
 
 ## Design (Frontend Design Skill)
@@ -28,6 +28,7 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
    ```
    Edit `.env.local`:
    - `ANTHROPIC_API_KEY` — [Anthropic API key](https://console.anthropic.com/)
+   - `TAVILY_API_KEY` — [Tavily API key](https://tavily.com/) (web search for research)
    - `AUTH_SECRET` — generate with `openssl rand -base64 32`
 
 2. **Database**  
