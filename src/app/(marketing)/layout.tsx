@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.app";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.com";
 
 const jsonLd = {
   "@context": "https://schema.org",

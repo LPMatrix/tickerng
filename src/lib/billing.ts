@@ -1,17 +1,11 @@
 import { db } from "@/db";
-import { report as reportTable, userSubscription as subscriptionTable } from "@/db/schema";
+import { report as reportTable } from "@/db/schema";
 import { eq, and, gte, count } from "drizzle-orm";
 
 export const FREE_MONTHLY_VERIFICATIONS = 3;
 
-export async function getSubscriptionStatus(userId: string): Promise<"free" | "active"> {
-  const [sub] = await db
-    .select({ status: subscriptionTable.status })
-    .from(subscriptionTable)
-    .where(eq(subscriptionTable.userId, userId))
-    .limit(1);
-  return sub?.status === "active" ? "active" : "free";
-}
+// Plan slug must match the slug defined in your Clerk dashboard
+export const PRO_PLAN_SLUG = "pro";
 
 export async function getMonthlyVerificationCount(userId: string): Promise<number> {
   const startOfMonth = new Date();
@@ -29,27 +23,4 @@ export async function getMonthlyVerificationCount(userId: string): Promise<numbe
       )
     );
   return row?.count ?? 0;
-}
-
-export async function checkVerificationQuota(
-  userId: string
-): Promise<{ allowed: boolean; used: number; limit: number; plan: "free" | "active" }> {
-  const plan = await getSubscriptionStatus(userId);
-  if (plan === "active") {
-    return { allowed: true, used: 0, limit: Infinity, plan };
-  }
-  const used = await getMonthlyVerificationCount(userId);
-  return {
-    allowed: used < FREE_MONTHLY_VERIFICATIONS,
-    used,
-    limit: FREE_MONTHLY_VERIFICATIONS,
-    plan,
-  };
-}
-
-export function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
-  const Stripe = require("stripe");
-  return new Stripe(key) as import("stripe").default;
 }

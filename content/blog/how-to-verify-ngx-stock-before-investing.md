@@ -129,7 +129,7 @@ Use a structured research tool (e.g. TickerNG) to get a first pass: financials, 
 
 - Run this checklist on one NGX ticker you’re considering this week.
 - Save your verdict and revisit it in 3–6 months to see how it aged.
-- If you want a structured report in under 60 seconds, try [TickerNG](https://tickerng.app) — Discovery for screening and Verification for a full report on any ticker.
+- If you want a structured report in under 60 seconds, try [TickerNG](https://tickerng.com) — Discovery for screening and Verification for a full report on any ticker.
 
 ---
 

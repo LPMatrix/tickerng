@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { checkVerificationQuota, FREE_MONTHLY_VERIFICATIONS } from "@/lib/billing";
+import { getMonthlyVerificationCount, FREE_MONTHLY_VERIFICATIONS, PRO_PLAN_SLUG } from "@/lib/billing";
 
 export async function GET() {
-  const { userId } = await auth();
+  const { userId, has } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const quota = await checkVerificationQuota(userId);
+  const isPro = has({ plan: PRO_PLAN_SLUG });
+  if (isPro) {
+    return NextResponse.json({ plan: "pro", used: 0, limit: null });
+  }
 
-  return NextResponse.json({
-    plan: quota.plan,
-    used: quota.used,
-    limit: quota.plan === "active" ? null : FREE_MONTHLY_VERIFICATIONS,
-  });
+  const used = await getMonthlyVerificationCount(userId);
+  return NextResponse.json({ plan: "free", used, limit: FREE_MONTHLY_VERIFICATIONS });
 }

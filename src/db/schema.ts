@@ -10,16 +10,6 @@ export const report = sqliteTable("report", {
   createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
 });
 
-/** Stripe subscription record keyed by Clerk user ID. */
-export const userSubscription = sqliteTable("userSubscription", {
-  userId: text("userId").primaryKey(),
-  stripeCustomerId: text("stripeCustomerId"),
-  stripeSubscriptionId: text("stripeSubscriptionId"),
-  status: text("status").notNull().default("free"), // "free" | "active" | "canceled"
-  currentPeriodEnd: integer("currentPeriodEnd", { mode: "timestamp_ms" }),
-  updatedAt: integer("updatedAt", { mode: "timestamp_ms" }).notNull(),
-});
-
 /** Share tokens for read-only report links. Token is secret; optional expiry and revocable. */
 export const reportShare = sqliteTable("reportShare", {
   id: text("id").primaryKey(),

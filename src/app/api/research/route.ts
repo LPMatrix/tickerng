@@ -20,7 +20,7 @@ import {
   discoveryTavilyOptions,
 } from "@/lib/tavily";
 import { langfuseSpanProcessor } from "@/instrumentation";
-import { checkVerificationQuota } from "@/lib/billing";
+import { getMonthlyVerificationCount, FREE_MONTHLY_VERIFICATIONS, PRO_PLAN_SLUG } from "@/lib/billing";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -70,7 +70,7 @@ async function runSpecialist(
 }
 
 const handler = async (request: NextRequest): Promise<NextResponse> => {
-  const { userId } = await auth();
+  const { userId, has } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -114,12 +114,15 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
         );
       }
 
-      const quota = await checkVerificationQuota(userId);
-      if (!quota.allowed) {
-        return NextResponse.json(
-          { error: "Monthly verification limit reached", quota },
-          { status: 402 }
-        );
+      const isPro = has({ plan: PRO_PLAN_SLUG });
+      if (!isPro) {
+        const used = await getMonthlyVerificationCount(userId);
+        if (used >= FREE_MONTHLY_VERIFICATIONS) {
+          return NextResponse.json(
+            { error: "Monthly verification limit reached", quota: { limit: FREE_MONTHLY_VERIFICATIONS, used } },
+            { status: 402 }
+          );
+        }
       }
 
       const results = await Promise.all(

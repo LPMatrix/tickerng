@@ -15,7 +15,7 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.app";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

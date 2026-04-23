@@ -404,43 +404,81 @@ export default function LandingPage() {
               Simple, transparent pricing
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--color-mute)]">
-              One plan for now. No hidden fees, no credit card required.
+              The value of structured NGX research is obvious after a few reports — start free, then
+              go unlimited when you’re ready.
             </p>
           </div>
-          <div className="mx-auto max-w-md">
-            <div className="rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg)] p-8 shadow-sm">
+          <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] p-8 shadow-sm">
               <div className="mb-6">
                 <h3 className="font-display text-xl font-semibold text-[var(--color-ink)]">Free</h3>
-                <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">₦0 <span className="text-base font-normal text-[var(--color-mute)]">/ month</span></p>
+                <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">
+                  $0
+                  <span className="text-base font-normal text-[var(--color-mute)]"> / month</span>
+                </p>
               </div>
               <ul className="space-y-3 text-[var(--color-ink)]">
-                <li className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
-                  <span>Unlimited Discovery reports — screen the whole NGX by theme or sector</span>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>
+                    <strong className="font-medium text-[var(--color-ink)]">3 Verification reports</strong> per
+                    month (full ticker deep-dives, resets monthly)
+                  </span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
-                  <span>Unlimited Verification reports — full bull/bear analysis on any ticker</span>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Unlimited Discovery — natural-language screening and shortlists</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
-                  <span>Save reports and shareable links</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
-                  <span>Export as PDF or copy as Markdown</span>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                  <span>Saved report history, shareable read-only links, export PDF &amp; Markdown</span>
                 </li>
               </ul>
-              <Link 
-                href="/signup" 
-                className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-base font-medium text-white hover:bg-[var(--color-accent)]/90 transition-colors"
+              <Link
+                href="/signup"
+                className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-3 text-base font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-bg)]"
               >
                 Get started free
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <p className="mt-4 text-center text-sm text-[var(--color-mute)]">
-                We may introduce paid tiers later. Free users will keep a generous free tier.
-              </p>
+            </div>
+
+            <div className="relative isolate">
+              <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--color-accent)]/40 bg-[var(--color-surface)] px-3 py-0.5 text-xs font-medium text-[var(--color-accent)] shadow-sm">
+                Pro
+              </span>
+              <div className="relative z-0 rounded-2xl border-2 border-[var(--color-accent)] bg-[var(--color-bg)] p-8 pt-6 shadow-md">
+                <div className="mb-6">
+                  <h3 className="font-display text-xl font-semibold text-[var(--color-ink)]">Unlimited</h3>
+                  <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">
+                    $15
+                    <span className="text-base font-normal text-[var(--color-mute)]"> / month</span>
+                  </p>
+                  <p className="mt-2 text-sm text-[var(--color-mute)]">
+                    Unlimited verification reports (and everything in Free), for active researchers.
+                  </p>
+                </div>
+                <ul className="space-y-3 text-[var(--color-ink)]">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                    <span>
+                      <strong className="font-medium text-[var(--color-ink)]">Unlimited</strong> Verification
+                      reports — no monthly cap
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-accent)]" />
+                    <span>All Discovery, history, sharing, and export features from Free</span>
+                  </li>
+                </ul>
+                <Link
+                  href="/signup"
+                  className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-base font-medium text-white transition-colors hover:bg-[var(--color-accent)]/90"
+                >
+                  Get unlimited
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
