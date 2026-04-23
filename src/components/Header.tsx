@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { BarChart3, ChevronRight } from "lucide-react";
+import { BarChart3, ChevronRight, CreditCard } from "lucide-react";
+import { BillingProfileContent } from "@/components/BillingProfileContent";
 
 export function Header() {
   return (
@@ -42,7 +43,15 @@ export function Header() {
                 "rounded-full ring-2 ring-transparent hover:ring-[var(--color-accent)]/30 focus-visible:ring-[var(--color-accent)] transition-shadow",
             },
           }}
-        />
+        >
+          <UserButton.UserProfilePage
+            label="Billing"
+            url="billing"
+            labelIcon={<CreditCard className="h-4 w-4" aria-hidden />}
+          >
+            <BillingProfileContent />
+          </UserButton.UserProfilePage>
+        </UserButton>
       </div>
     </header>
   );
