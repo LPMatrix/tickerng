@@ -32,14 +32,14 @@ function makeRequest(body: string, signature: string): NextRequest {
 function makeStripeMock(event: object) {
   const insertChain = { values: vi.fn().mockReturnThis(), onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) };
   const updateChain = { set: vi.fn().mockReturnThis(), where: vi.fn().mockResolvedValue(undefined) };
-  vi.mocked(db.insert).mockReturnValue(insertChain as ReturnType<typeof db.insert>);
-  vi.mocked(db.update).mockReturnValue(updateChain as ReturnType<typeof db.update>);
+  vi.mocked(db.insert).mockReturnValue(insertChain as unknown as ReturnType<typeof db.insert>);
+  vi.mocked(db.update).mockReturnValue(updateChain as unknown as ReturnType<typeof db.update>);
 
   vi.mocked(getStripe).mockReturnValue({
     webhooks: {
       constructEvent: vi.fn().mockReturnValue(event),
     },
-  } as ReturnType<typeof getStripe>);
+  } as unknown as ReturnType<typeof getStripe>);
 
   return { insertChain, updateChain };
 }
@@ -73,7 +73,7 @@ describe("POST /api/webhooks/stripe", () => {
           throw new Error("Signature mismatch");
         }),
       },
-    } as ReturnType<typeof getStripe>);
+    } as unknown as ReturnType<typeof getStripe>);
 
     const req = makeRequest("{}", "bad_sig");
     const res = await POST(req);

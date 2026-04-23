@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ModeSelector, type ResearchMode } from "@/components/ModeSelector";
 import { ResearchForm } from "@/components/ResearchForm";
 import { ReportView } from "@/components/ReportView";
 import { ReportHistory } from "@/components/ReportHistory";
 import { Header } from "@/components/Header";
 import { ReportExport } from "@/components/ReportExport";
-import { EvaluationPanel } from "@/components/EvaluationPanel";
 import { UsageIndicator } from "@/components/UsageIndicator";
-import { Sparkles, FileText, BarChart3 } from "lucide-react";
+import { Sparkles, FileText, BarChart3, ChevronLeft, ChevronRight, History } from "lucide-react";
 
 /**
  * TickerNG Research Dashboard
@@ -23,8 +22,21 @@ export default function ResearchPage() {
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [reportsVersion, setReportsVersion] = useState(0);
   const [query, setQuery] = useState("");
-  const [evaluationKey, setEvaluationKey] = useState(0);
   const [usageVersion, setUsageVersion] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("tickerng:sidebar");
+    if (saved === "closed") setSidebarOpen(false);
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem("tickerng:sidebar", next ? "open" : "closed");
+      return next;
+    });
+  }, []);
 
   const handleSubmit = useCallback(async (
     inputQuery: string,
@@ -35,7 +47,6 @@ export default function ResearchPage() {
     setQuery(inputQuery);
     setReport("");
     setCurrentReportId(null);
-    setEvaluationKey((k) => k + 1);
     setIsRunning(true);
     try {
       const res = await fetch("/api/research", {
@@ -230,22 +241,14 @@ export default function ResearchPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      <ReportView
-                        content={report}
-                        isStreaming={isRunning}
-                        mode={mode}
-                        onRunVerification={(ticker) =>
-                          handleSubmit(ticker, { modeOverride: "verification" })
-                        }
-                      />
-                      {!isRunning && currentReportId && (
-                        <EvaluationPanel
-                          key={evaluationKey}
-                          reportId={currentReportId}
-                        />
-                      )}
-                    </div>
+                    <ReportView
+                      content={report}
+                      isStreaming={isRunning}
+                      mode={mode}
+                      onRunVerification={(ticker) =>
+                        handleSubmit(ticker, { modeOverride: "verification" })
+                      }
+                    />
                   )}
                 </div>
               </div>
@@ -270,23 +273,64 @@ export default function ResearchPage() {
 
         {/* Sidebar: Recent Reports */}
         <aside
-          className="w-full border-t border-[var(--color-border)] bg-[var(--color-surface)] md:w-80 md:min-h-[calc(100vh-80px)] md:border-l md:border-t-0"
           aria-label="Recent reports"
+          className={`relative flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] transition-all duration-300 md:border-l md:border-t-0 ${
+            sidebarOpen
+              ? "w-full md:w-80"
+              : "w-full md:w-10"
+          }`}
         >
-          <div className="sticky top-0 p-6">
-            <ReportHistory
-              reportsVersion={reportsVersion}
-              onSelectReport={handleSelectReport}
-              currentReportId={currentReportId}
-              onReportDeleted={(id) => {
-                if (currentReportId === id) {
-                  setCurrentReportId(null);
-                  setReport("");
-                  setQuery("");
-                }
-              }}
-            />
-          </div>
+          {/* Collapse toggle — desktop only */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            className="absolute -left-3.5 top-6 z-10 hidden h-7 w-7 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-mute)] shadow-sm transition-colors hover:text-[var(--color-accent)] md:flex"
+          >
+            {sidebarOpen ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </button>
+
+          {/* Collapsed state — icon strip (desktop) */}
+          {!sidebarOpen && (
+            <div className="hidden h-full flex-col items-center pt-6 md:flex">
+              <History className="h-4 w-4 text-[var(--color-accent)]" />
+            </div>
+          )}
+
+          {/* Expanded content */}
+          {sidebarOpen && (
+            <div className="sticky top-0 p-6">
+              {/* Mobile collapse toggle */}
+              <div className="mb-4 flex items-center justify-between md:hidden">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-mute)]">
+                  Recent Reports
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  className="rounded-md p-1 text-[var(--color-mute)] hover:text-[var(--color-accent)]"
+                >
+                  <ChevronLeft className="h-4 w-4 rotate-90" />
+                </button>
+              </div>
+              <ReportHistory
+                reportsVersion={reportsVersion}
+                onSelectReport={handleSelectReport}
+                currentReportId={currentReportId}
+                onReportDeleted={(id) => {
+                  if (currentReportId === id) {
+                    setCurrentReportId(null);
+                    setReport("");
+                    setQuery("");
+                  }
+                }}
+              />
+            </div>
+          )}
         </aside>
       </div>
     </div>

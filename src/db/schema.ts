@@ -7,7 +7,6 @@ export const report = sqliteTable("report", {
   mode: text("mode").notNull(), // "discovery" | "verification"
   query: text("query").notNull(),
   content: text("content").notNull(),
-  evaluation: text("evaluation"), // JSON-serialised Evaluation | null
   createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
 });
 

@@ -1,5 +1,6 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { generateText, streamText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { observe, setActiveTraceIO } from "@langfuse/tracing";
 import { auth } from "@clerk/nextjs/server";
 import { getSystemPrompt, getUserMessage } from "@/lib/prompts";
@@ -21,7 +22,11 @@ import {
 import { langfuseSpanProcessor } from "@/instrumentation";
 import { checkVerificationQuota } from "@/lib/billing";
 
-const MODEL = "anthropic/claude-sonnet-4.6";
+const openrouter = createOpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+const MODEL = openrouter("anthropic/claude-sonnet-4.6");
 
 function normalizeTicker(raw: string): string {
   return raw.trim().replace(/\s+/g, "").toUpperCase();
@@ -70,9 +75,9 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.VERCEL_OIDC_TOKEN) {
+  if (!process.env.OPENROUTER_API_KEY) {
     return NextResponse.json(
-      { error: "AI Gateway auth not configured — run `vercel env pull` to provision VERCEL_OIDC_TOKEN" },
+      { error: "OPENROUTER_API_KEY is not configured" },
       { status: 503 }
     );
   }

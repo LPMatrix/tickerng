@@ -23,7 +23,7 @@ function mockDbQuery(returnValue: unknown) {
     where: vi.fn().mockReturnThis(),
     limit: vi.fn().mockResolvedValue(returnValue),
   };
-  vi.mocked(db.select).mockReturnValue(chain as ReturnType<typeof db.select>);
+  vi.mocked(db.select).mockReturnValue(chain as unknown as ReturnType<typeof db.select>);
   return chain;
 }
 
@@ -64,7 +64,7 @@ describe("getMonthlyVerificationCount", () => {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockResolvedValue([{ count: 2 }]),
     };
-    vi.mocked(db.select).mockReturnValue(chain as ReturnType<typeof db.select>);
+    vi.mocked(db.select).mockReturnValue(chain as unknown as ReturnType<typeof db.select>);
 
     const result = await getMonthlyVerificationCount("user_123");
     expect(result).toBe(2);
@@ -76,7 +76,7 @@ describe("getMonthlyVerificationCount", () => {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockResolvedValue([]),
     };
-    vi.mocked(db.select).mockReturnValue(chain as ReturnType<typeof db.select>);
+    vi.mocked(db.select).mockReturnValue(chain as unknown as ReturnType<typeof db.select>);
 
     const result = await getMonthlyVerificationCount("user_new");
     expect(result).toBe(0);
@@ -92,7 +92,7 @@ describe("checkVerificationQuota", () => {
       where: vi.fn().mockReturnThis(),
       limit: vi.fn().mockResolvedValue([{ status: "active" }]),
     };
-    vi.mocked(db.select).mockReturnValue(statusChain as ReturnType<typeof db.select>);
+    vi.mocked(db.select).mockReturnValue(statusChain as unknown as ReturnType<typeof db.select>);
 
     const result = await checkVerificationQuota("user_pro");
     expect(result.allowed).toBe(true);
@@ -112,7 +112,7 @@ describe("checkVerificationQuota", () => {
           where: vi.fn().mockReturnThis(),
           limit: vi.fn().mockResolvedValue([{ status: "free" }]),
         };
-        return chain as ReturnType<typeof db.select>;
+        return chain as unknown as ReturnType<typeof db.select>;
       }
       // getMonthlyVerificationCount
       const chain = {
@@ -120,7 +120,7 @@ describe("checkVerificationQuota", () => {
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockResolvedValue([{ count: FREE_MONTHLY_VERIFICATIONS }]),
       };
-      return chain as ReturnType<typeof db.select>;
+      return chain as unknown as ReturnType<typeof db.select>;
     });
 
     const result = await checkVerificationQuota("user_free_exhausted");
@@ -140,14 +140,14 @@ describe("checkVerificationQuota", () => {
           where: vi.fn().mockReturnThis(),
           limit: vi.fn().mockResolvedValue([]),
         };
-        return chain as ReturnType<typeof db.select>;
+        return chain as unknown as ReturnType<typeof db.select>;
       }
       const chain = {
         select: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockResolvedValue([{ count: 1 }]),
       };
-      return chain as ReturnType<typeof db.select>;
+      return chain as unknown as ReturnType<typeof db.select>;
     });
 
     const result = await checkVerificationQuota("user_free_partial");
