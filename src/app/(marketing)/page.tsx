@@ -24,7 +24,7 @@ export default function LandingPage() {
               <BarChart3 className="h-5 w-5" />
             </div>
             <span className="font-display text-xl font-semibold tracking-tight text-[var(--color-ink)]">
-              EquiScan
+              TickerNG
             </span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
@@ -109,7 +109,7 @@ export default function LandingPage() {
               Two powerful research modes
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--color-mute)]">
-              Whether you&apos;re exploring new opportunities or analyzing a specific stock, EquiScan gives you the tools to make informed decisions.
+              Whether you&apos;re exploring new opportunities or analyzing a specific stock, TickerNG gives you the tools to make informed decisions.
             </p>
           </div>
 
@@ -453,7 +453,7 @@ export default function LandingPage() {
             Start researching smarter today
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">
-            Join investors who use EquiScan to make better decisions on the Nigerian Exchange.
+            Join investors who use TickerNG to make better decisions on the Nigerian Exchange.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link 
@@ -482,11 +482,11 @@ export default function LandingPage() {
                 <BarChart3 className="h-5 w-5" />
               </div>
               <span className="font-display text-xl font-semibold tracking-tight text-[var(--color-ink)]">
-                EquiScan
+                TickerNG
               </span>
             </div>
             <p className="text-sm text-[var(--color-mute)]">
-              © {new Date().getFullYear()} EquiScan. Research tool for the Nigerian Exchange.
+              © {new Date().getFullYear()} TickerNG. Research tool for the Nigerian Exchange.
             </p>
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-sm text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors">

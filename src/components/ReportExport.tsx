@@ -49,7 +49,7 @@ export function ReportExport({ content, query, mode, reportId, onCopyShareLink }
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
-      doc.text("EquiScan Report", margin, 12);
+      doc.text("TickerNG Report", margin, 12);
 
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
@@ -192,7 +192,7 @@ export function ReportExport({ content, query, mode, reportId, onCopyShareLink }
         doc.setFontSize(8);
         doc.setTextColor(154, 154, 154);
         doc.text(
-          `Page ${i} of ${totalPages} | EquiScan - NGX Research Tool`,
+          `Page ${i} of ${totalPages} | TickerNG - NGX Research Tool`,
           pageWidth / 2,
           pageHeight - 8,
           { align: "center" }
@@ -200,7 +200,7 @@ export function ReportExport({ content, query, mode, reportId, onCopyShareLink }
       }
       
       // Download
-      const filename = `equiscan-report-${query.replace(/\s+/g, "-").toLowerCase().slice(0, 30)}-${Date.now()}.pdf`;
+      const filename = `tickerng-report-${query.replace(/\s+/g, "-").toLowerCase().slice(0, 30)}-${Date.now()}.pdf`;
       doc.save(filename);
     } catch (err) {
       console.error("Failed to export PDF:", err);

@@ -1,6 +1,6 @@
-# EquiScan — Brand Voice & Content Guidelines
+# TickerNG — Brand Voice & Content Guidelines
 
-Use this doc for all EquiScan content: landing copy, blog, social, and email. For full frameworks (templates, SEO, repurposing), use the content-creator skill references.
+Use this doc for all TickerNG content: landing copy, blog, social, and email. For full frameworks (templates, SEO, repurposing), use the content-creator skill references.
 
 ---
 
@@ -55,7 +55,7 @@ Use this doc for all EquiScan content: landing copy, blog, social, and email. Fo
 |---------|------|------|
 | **Landing / Website** | Convert visitors; set expectations | Benefit-led headlines; short paragraphs; clear CTAs. |
 | **Blog / SEO** | Educate and attract search | How-to and listicles; NGX and verification keywords; internal link to app. |
-| **X (Twitter)** | Founder-led; tips and demos | Short threads, one tip per tweet; link to EquiScan or blog. |
+| **X (Twitter)** | Founder-led; tips and demos | Short threads, one tip per tweet; link to TickerNG or blog. |
 | **LinkedIn** | Professional credibility | One clear post per launch/feature; problem → solution → CTA. |
 | **Email** | Nurture and announce | Scannable; one main message; link to try or read more. |
 
@@ -66,13 +66,13 @@ Use this doc for all EquiScan content: landing copy, blog, social, and email. Fo
 - **Oxford comma:** Use.
 - **Numbers:** Use numerals for percentages and large numbers; spell out one through nine in prose when not data.
 - **Headlines:** H1 = benefit or promise; H2/H3 = clear, scannable.
-- **CTAs:** Action verbs: "Start researching free," "Get your report," "Try EquiScan."
+- **CTAs:** Action verbs: "Start researching free," "Get your report," "Try TickerNG."
 
 ---
 
 ## 8. Pre-Publish Checklist
 
-- [ ] Matches EquiScan voice (Guide + Expert; you/your; no buy/sell signal language).
+- [ ] Matches TickerNG voice (Guide + Expert; you/your; no buy/sell signal language).
 - [ ] NGX or Nigerian context where relevant.
 - [ ] Clear value and one CTA.
 - [ ] No return or performance guarantees.

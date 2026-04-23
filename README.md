@@ -1,4 +1,4 @@
-# EquiScan — NGX Research Tool
+# TickerNG — NGX Research Tool
 
 Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Discovery** (natural language → shortlist of stocks) and **Verification** (ticker → full report).
 
@@ -32,7 +32,7 @@ Fast, structured stock research on the Nigerian Exchange (NGX). Two modes: **Dis
    - `AUTH_SECRET` — generate with `openssl rand -base64 32`
 
 2. **Database**  
-   SQLite DB is created at `./data/equiscan.db` on first run. Tables are created automatically. Optional: run `npm run db:push` after installing (requires `better-sqlite3` native build).
+   SQLite DB is created at `./data/tickerng.db` on first run. Tables are created automatically. Optional: run `npm run db:push` after installing (requires `better-sqlite3` native build).
 
 3. **Start dev server**
    ```bash

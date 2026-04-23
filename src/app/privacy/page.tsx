@@ -3,7 +3,7 @@ import { BarChart3, ArrowLeft } from "lucide-react";
 
 export const metadata = {
   title: "Privacy Policy",
-  description: "EquiScan privacy policy — how we collect, use, and protect your data.",
+  description: "TickerNG privacy policy — how we collect, use, and protect your data.",
 };
 
 export default function PrivacyPage() {
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
             className="inline-flex items-center gap-2 text-[var(--color-ink)] hover:text-[var(--color-accent)]"
           >
             <BarChart3 className="h-6 w-6 text-[var(--color-accent)]" />
-            <span className="font-display text-lg font-semibold">EquiScan</span>
+            <span className="font-display text-lg font-semibold">TickerNG</span>
           </Link>
           <Link
             href="/"
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           </p>
           <p className="mt-4 text-[var(--color-mute)]">
             In the meantime: we do not sell your personal information. Research history and account
-            data are stored securely and used only to provide and improve EquiScan. You can delete
+            data are stored securely and used only to provide and improve TickerNG. You can delete
             your account at any time.
           </p>
         </div>
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
           className="mt-10 inline-flex items-center gap-2 text-[var(--color-accent)] hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
-          Return to EquiScan
+          Return to TickerNG
         </Link>
       </main>
     </div>

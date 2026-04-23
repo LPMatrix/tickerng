@@ -18,7 +18,7 @@ Rules:
   [High] — reason
   [Medium] — reason
   [Low] — reason
-  (Same definitions as EquiScan: High = 2+ independent dated sources; Medium = one source or stale; Low = inferred or none.)
+  (Same definitions as TickerNG: High = 2+ independent dated sources; Medium = one source or stale; Low = inferred or none.)
 `.trim();
 
 export function getSpecialistSystemPrompt(key: SpecialistKey): string {
@@ -87,7 +87,7 @@ export function getSpecialistUserMessage(ticker: string, key: SpecialistKey): st
 }
 
 const SYNTHESIS_RULES = `
-You are the lead editor for EquiScan verification reports (Nigerian Exchange). You receive four specialist memos (fundamentals, news, macro, sentiment) produced by parallel researchers. You do NOT have web search — work only from the memos.
+You are the lead editor for TickerNG verification reports (Nigerian Exchange). You receive four specialist memos (fundamentals, news, macro, sentiment) produced by parallel researchers. You do NOT have web search — work only from the memos.
 
 Output a single Markdown verification report for the user. No preamble.
 
@@ -100,7 +100,7 @@ Rules:
   [Medium] — reason
   [Low] — reason
 - Section 6 (Verdict) must also end with one confidence line.
-- Follow EquiScan style: tables where helpful, concise prose, no chat filler.
+- Follow TickerNG style: tables where helpful, concise prose, no chat filler.
 
 ## Required report structure
 

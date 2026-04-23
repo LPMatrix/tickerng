@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { report as reportTable } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -7,10 +7,9 @@ import { randomUUID } from "crypto";
 
 const MAX_LIST = 50;
 
-/** GET: list recent reports for the current user */
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const rows = await db
@@ -21,16 +20,15 @@ export async function GET() {
       createdAt: reportTable.createdAt,
     })
     .from(reportTable)
-    .where(eq(reportTable.userId, session.user.id))
+    .where(eq(reportTable.userId, userId))
     .orderBy(desc(reportTable.createdAt))
     .limit(MAX_LIST);
   return NextResponse.json(rows);
 }
 
-/** POST: create a new report (save after stream completes) */
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json();
@@ -46,7 +44,7 @@ export async function POST(request: NextRequest) {
   const id = randomUUID();
   await db.insert(reportTable).values({
     id,
-    userId: session.user.id,
+    userId,
     mode,
     query,
     content,

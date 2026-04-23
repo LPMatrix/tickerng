@@ -1,4 +1,4 @@
-# SEO Audit — EquiScan
+# SEO Audit — TickerNG
 
 **Audit date:** 2025-03-14  
 **Scope:** Technical SEO + on-page (codebase and structure). No Search Console, Analytics, or crawl data.
@@ -22,7 +22,7 @@
 
 ## Executive Summary
 
-EquiScan’s marketing and app structure are in place with a clear landing H1, sections, and internal links. The main gaps are: **no sitemap or robots.txt**, **one shared title/description for all routes** (including signup and shared reports), **no Open Graph/Twitter cards**, and **no privacy/terms in the footer**. Addressing these will improve crawl efficiency, SERP differentiation, and trust.
+TickerNG’s marketing and app structure are in place with a clear landing H1, sections, and internal links. The main gaps are: **no sitemap or robots.txt**, **one shared title/description for all routes** (including signup and shared reports), **no Open Graph/Twitter cards**, and **no privacy/terms in the footer**. Addressing these will improve crawl efficiency, SERP differentiation, and trust.
 
 ---
 
@@ -106,14 +106,14 @@ EquiScan’s marketing and app structure are in place with a clear landing H1, s
 
 | Field              | Value                                                                                                                                                                                                                                                                                            |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Issue**          | Every route uses the same `<title>` and meta description from root layout: “EquiScan — NGX Research Tool” and one generic blurb.                                                                                                                                                                 |
+| **Issue**          | Every route uses the same `<title>` and meta description from root layout: “TickerNG — NGX Research Tool” and one generic blurb.                                                                                                                                                                 |
 | **Category**       | On-Page Optimization                                                                                                                                                                                                                                                                             |
 | **Evidence**       | `src/app/layout.tsx` and `src/app/(marketing)/layout.tsx` both export identical `metadata`: same `title` and `description`. Signin, signup, research, and `/r/[token]` do not override.                                                                                                          |
 | **Severity**       | Critical                                                                                                                                                                                                                                                                                         |
 | **Confidence**     | High                                                                                                                                                                                                                                                                                             |
 | **Why it matters** | SERP snippets are indistinguishable; signup/signin lose intent-specific copy; shared reports look like the homepage. This hurts CTR and relevance signals.                                                                                                                                       |
 | **Score impact**   | −25 (On-Page)                                                                                                                                                                                                                                                                                    |
-| **Recommendation** | Add per-route or per-section metadata: unique title/description for landing (e.g. “Full NGX stock research in under 60 seconds”), signup (“Create your free EquiScan account”), signin (“Sign in — EquiScan”), and shared report (e.g. “Shared report — EquiScan” or dynamic title from report). |
+| **Recommendation** | Add per-route or per-section metadata: unique title/description for landing (e.g. “Full NGX stock research in under 60 seconds”), signup (“Create your free TickerNG account”), signin (“Sign in — TickerNG”), and shared report (e.g. “Shared report — TickerNG” or dynamic title from report). |
 
 
 ---
@@ -193,12 +193,12 @@ EquiScan’s marketing and app structure are in place with a clear landing H1, s
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Issue**          | Landing page has no visible author, “About”, or last-reviewed date.                                                                                                    |
 | **Category**       | Content Quality & E-E-A-T                                                                                                                                              |
-| **Evidence**       | Single marketing page component; no author block or “About EquiScan” section; footer is minimal.                                                                       |
+| **Evidence**       | Single marketing page component; no author block or “About TickerNG” section; footer is minimal.                                                                       |
 | **Severity**       | Low                                                                                                                                                                    |
 | **Confidence**     | High                                                                                                                                                                   |
 | **Why it matters** | E-E-A-T benefits from clear ownership and transparency, especially for a financial tool.                                                                               |
 | **Score impact**   | −8 (Content/E-E-A-T)                                                                                                                                                   |
-| **Recommendation** | Add a short “About” or “Why EquiScan” section and/or footer line (e.g. “Built for Nigerian retail investors”). Optional: last-reviewed or “Updated” date for the page. |
+| **Recommendation** | Add a short “About” or “Why TickerNG” section and/or footer line (e.g. “Built for Nigerian retail investors”). Optional: last-reviewed or “Updated” date for the page. |
 
 
 ---

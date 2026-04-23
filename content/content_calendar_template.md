@@ -1,4 +1,4 @@
-# EquiScan Content Calendar — [Month Year]
+# TickerNG Content Calendar — [Month Year]
 
 **Pillar ratio:** 40% Educational | 25% Inspirational/Use cases | 25% Conversational | 10% Promotional  
 **Primary channels:** X (Twitter), LinkedIn; optional: Blog, Email when live.
@@ -20,7 +20,7 @@
 **Channel:** Blog (if published)  
 **Topic:** How to verify an NGX stock / or repurpose snippet  
 **Status:** [ ] Planned [ ] Written [ ] Published  
-**CTA:** Link to EquiScan or signup
+**CTA:** Link to TickerNG or signup
 
 ### Tuesday [Date]
 **Channel:** X  
@@ -33,7 +33,7 @@
 ### Wednesday [Date]
 **Channel:** LinkedIn  
 **Type:** Post  
-**Topic:** (e.g. Why I built EquiScan / How I research NGX stocks)  
+**Topic:** (e.g. Why I built TickerNG / How I research NGX stocks)  
 **First 2 lines:**  
 **Time:** 8–10 AM  
 **Status:** [ ] Drafted [ ] Published
@@ -96,7 +96,7 @@
 
 1. “5 things to check before buying an NGX dividend stock”
 2. “Discovery vs Verification — when to use each”
-3. “How to share an EquiScan report with your advisor”
+3. “How to share an TickerNG report with your advisor”
 4. Screenshot: DANGCEM (or other) Verification report with confidence badges
 5. “Why we show bull/bear verdict, not buy/sell signals”
 

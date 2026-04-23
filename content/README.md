@@ -1,6 +1,6 @@
-# EquiScan Content (Content-Creator Skill)
+# TickerNG Content (Content-Creator Skill)
 
-This folder holds EquiScan-specific content created with the **content-creator** skill: brand voice, pillar blog post, launch social content, and a content calendar template.
+This folder holds TickerNG-specific content created with the **content-creator** skill: brand voice, pillar blog post, launch social content, and a content calendar template.
 
 ## Contents
 
@@ -14,7 +14,7 @@ This folder holds EquiScan-specific content created with the **content-creator**
 
 ## Using the content-creator skill
 
-- **Brand voice:** Before new content, skim `brand_guidelines.md` so copy matches EquiScan voice (Guide + Expert; you/your; bull/bear not buy/sell).
+- **Brand voice:** Before new content, skim `brand_guidelines.md` so copy matches TickerNG voice (Guide + Expert; you/your; bull/bear not buy/sell).
 - **SEO:** When you add a blog route, paste the pillar post into a page or MDX. To score it: from the skill directory run  
   `python scripts/seo_optimizer.py <path-to-post> "verify NGX stock" "research Nigerian stocks,NGX stock research"`.
 - **Social:** Use `launch-x-thread.md` and `launch-linkedin-post.md` as-is for launch; reuse the structure for future threads and posts.

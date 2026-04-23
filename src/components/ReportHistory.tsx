@@ -127,7 +127,7 @@ export function ReportHistory({
       `;
       tempDiv.innerHTML = `
         <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 16px; color: #0d5c3d;">
-          EquiScan Report
+          TickerNG Report
         </h1>
         <p style="color: #6b6b6b; margin-bottom: 24px;">
           <strong>Mode:</strong> ${getModeLabel(report.mode)}<br/>
@@ -167,7 +167,7 @@ export function ReportHistory({
         heightLeft -= pageHeight;
       }
 
-      const filename = `equiscan-report-${report.query.replace(/\s+/g, "-").toLowerCase().slice(0, 30)}-${Date.now()}.pdf`;
+      const filename = `tickerng-report-${report.query.replace(/\s+/g, "-").toLowerCase().slice(0, 30)}-${Date.now()}.pdf`;
       pdf.save(filename);
     } catch (err) {
       console.error("Failed to export PDF:", err);

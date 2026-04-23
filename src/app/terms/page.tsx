@@ -3,7 +3,7 @@ import { BarChart3, ArrowLeft } from "lucide-react";
 
 export const metadata = {
   title: "Terms of Service",
-  description: "EquiScan terms of service — use of the NGX research tool.",
+  description: "TickerNG terms of service — use of the NGX research tool.",
 };
 
 export default function TermsPage() {
@@ -16,7 +16,7 @@ export default function TermsPage() {
             className="inline-flex items-center gap-2 text-[var(--color-ink)] hover:text-[var(--color-accent)]"
           >
             <BarChart3 className="h-6 w-6 text-[var(--color-accent)]" />
-            <span className="font-display text-lg font-semibold">EquiScan</span>
+            <span className="font-display text-lg font-semibold">TickerNG</span>
           </Link>
           <Link
             href="/"
@@ -39,7 +39,7 @@ export default function TermsPage() {
             Our full terms of service are in preparation and will be published here soon.
           </p>
           <p className="mt-4 text-[var(--color-mute)]">
-            By using EquiScan you agree that the research and reports we provide are for
+            By using TickerNG you agree that the research and reports we provide are for
             informational purposes only and do not constitute investment advice. You are responsible
             for your own investment decisions on the Nigerian Exchange.
           </p>
@@ -49,7 +49,7 @@ export default function TermsPage() {
           className="mt-10 inline-flex items-center gap-2 text-[var(--color-accent)] hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
-          Return to EquiScan
+          Return to TickerNG
         </Link>
       </main>
     </div>

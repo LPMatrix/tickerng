@@ -7,10 +7,12 @@ import { ReportView } from "@/components/ReportView";
 import { ReportHistory } from "@/components/ReportHistory";
 import { Header } from "@/components/Header";
 import { ReportExport } from "@/components/ReportExport";
+import { EvaluationPanel } from "@/components/EvaluationPanel";
+import { UsageIndicator } from "@/components/UsageIndicator";
 import { Sparkles, FileText, BarChart3 } from "lucide-react";
 
 /**
- * EquiScan Research Dashboard
+ * TickerNG Research Dashboard
  * A polished, market-ready research interface with clear visual hierarchy,
  * refined interactions, and professional presentation.
  */
@@ -21,6 +23,8 @@ export default function ResearchPage() {
   const [currentReportId, setCurrentReportId] = useState<string | null>(null);
   const [reportsVersion, setReportsVersion] = useState(0);
   const [query, setQuery] = useState("");
+  const [evaluationKey, setEvaluationKey] = useState(0);
+  const [usageVersion, setUsageVersion] = useState(0);
 
   const handleSubmit = useCallback(async (
     inputQuery: string,
@@ -31,6 +35,7 @@ export default function ResearchPage() {
     setQuery(inputQuery);
     setReport("");
     setCurrentReportId(null);
+    setEvaluationKey((k) => k + 1);
     setIsRunning(true);
     try {
       const res = await fetch("/api/research", {
@@ -42,6 +47,16 @@ export default function ResearchPage() {
           includeMacroContext: options?.includeMacroContext ?? true,
         }),
       });
+      if (res.status === 402) {
+        const data = await res.json().catch(() => ({}));
+        const quota = data.quota;
+        setReport(
+          `## Verification limit reached\n\nYou've used all ${quota?.limit ?? 3} free verifications this month.\n\n` +
+          `**Upgrade to Pro** for unlimited verifications — click the Upgrade button above.`
+        );
+        setUsageVersion((v) => v + 1);
+        return;
+      }
       if (!res.ok) throw new Error("Research request failed");
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -67,6 +82,7 @@ export default function ResearchPage() {
           const { id } = await saveRes.json();
           setCurrentReportId(id);
           setReportsVersion((v) => v + 1);
+          if (effectiveMode === "verification") setUsageVersion((v) => v + 1);
         }
       }
     } catch {
@@ -129,8 +145,11 @@ export default function ResearchPage() {
                     Select a research mode and enter your query to generate comprehensive NGX stock analysis powered by AI.
                   </p>
                 </div>
-                <div className="hidden h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] sm:flex">
-                  <Sparkles className="h-6 w-6" />
+                <div className="hidden flex-col items-end gap-2 sm:flex">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <UsageIndicator key={usageVersion} />
                 </div>
               </div>
 
@@ -211,14 +230,22 @@ export default function ResearchPage() {
                       </p>
                     </div>
                   ) : (
-                    <ReportView
-                      content={report}
-                      isStreaming={isRunning}
-                      mode={mode}
-                      onRunVerification={(ticker) =>
-                        handleSubmit(ticker, { modeOverride: "verification" })
-                      }
-                    />
+                    <div className="space-y-6">
+                      <ReportView
+                        content={report}
+                        isStreaming={isRunning}
+                        mode={mode}
+                        onRunVerification={(ticker) =>
+                          handleSubmit(ticker, { modeOverride: "verification" })
+                        }
+                      />
+                      {!isRunning && currentReportId && (
+                        <EvaluationPanel
+                          key={evaluationKey}
+                          reportId={currentReportId}
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

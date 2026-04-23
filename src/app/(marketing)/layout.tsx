@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://equiscan.app";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.app";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -23,14 +23,14 @@ const jsonLd = {
     {
       "@type": "Organization",
       "@id": `${baseUrl}/#organization`,
-      name: "EquiScan",
+      name: "TickerNG",
       url: baseUrl,
       description: "Full NGX stock research in under 60 seconds. Your personal NGX analyst, on demand.",
     },
     {
       "@type": "WebApplication",
       "@id": `${baseUrl}/#webapp`,
-      name: "EquiScan",
+      name: "TickerNG",
       url: baseUrl,
       applicationCategory: "FinanceApplication",
       description: "AI-powered Discovery and Verification reports for stocks on the Nigerian Exchange (NGX).",

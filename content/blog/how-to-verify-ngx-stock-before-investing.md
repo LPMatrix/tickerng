@@ -12,7 +12,7 @@
 
 You’ve seen a ticker on the Nigerian Exchange (NGX) — maybe from a tip, a dividend list, or sector screen. Before you put money in, you need to verify the stock: not just that it exists, but that the numbers, risks, and story line up with your strategy.
 
-This guide gives you a clear, repeatable way to verify any NGX stock. You’ll see what to check, where to look, and how to turn that into a go/no-go decision. No fluff — just a structure you can use in under an hour (or in under a minute with a tool like EquiScan).
+This guide gives you a clear, repeatable way to verify any NGX stock. You’ll see what to check, where to look, and how to turn that into a go/no-go decision. No fluff — just a structure you can use in under an hour (or in under a minute with a tool like TickerNG).
 
 **You’ll learn:**
 - The 5 things to verify before buying an NGX stock
@@ -113,7 +113,7 @@ Use the company’s investor relations page, NGX announcements, or a data provid
 Cheap can get cheaper. Factor sector cycle into your risk list and your verdict. Don’t rely on P/E alone.
 
 ### “I don’t have time to do this for every idea.”
-Use a structured research tool (e.g. EquiScan) to get a first pass: financials, valuation, risks, catalysts, and a bull/bear summary. Then deepen manually for names you’re serious about.
+Use a structured research tool (e.g. TickerNG) to get a first pass: financials, valuation, risks, catalysts, and a bull/bear summary. Then deepen manually for names you’re serious about.
 
 ---
 
@@ -129,7 +129,7 @@ Use a structured research tool (e.g. EquiScan) to get a first pass: financials, 
 
 - Run this checklist on one NGX ticker you’re considering this week.
 - Save your verdict and revisit it in 3–6 months to see how it aged.
-- If you want a structured report in under 60 seconds, try [EquiScan](https://equiscan.app) — Discovery for screening and Verification for a full report on any ticker.
+- If you want a structured report in under 60 seconds, try [TickerNG](https://tickerng.app) — Discovery for screening and Verification for a full report on any ticker.
 
 ---
 

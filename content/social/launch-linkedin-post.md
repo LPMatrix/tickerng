@@ -1,4 +1,4 @@
-# LinkedIn Post — EquiScan Launch
+# LinkedIn Post — TickerNG Launch
 
 **Use for:** One clear launch/announcement post; professional audience.  
 **Best time:** Tuesday–Thursday, 8–10 AM or 5–6 PM.  
@@ -11,9 +11,9 @@ I kept spending 30+ minutes per stock just to pull together financials, valuatio
 
 **Body:**
 
-Before EquiScan, my research process was the same every time: open multiple tabs, grab numbers from different sources, and manually build a view on financial health, valuation, and risk. Fine for one or two tickers. Painful when you’re screening a sector or comparing a shortlist.
+Before TickerNG, my research process was the same every time: open multiple tabs, grab numbers from different sources, and manually build a view on financial health, valuation, and risk. Fine for one or two tickers. Painful when you’re screening a sector or comparing a shortlist.
 
-I wanted one place to get a structured report — the same checklist I’d run myself, but generated consistently. So I built EquiScan.
+I wanted one place to get a structured report — the same checklist I’d run myself, but generated consistently. So I built TickerNG.
 
 **What it does:**  
 • **Discovery** — Ask in plain English (e.g. “best dividend-paying banks on NGX”) and get a shortlist of stocks that match.  
@@ -25,7 +25,7 @@ It’s live and free to use. If you research Nigerian equities and have feedback
 
 Link: [YOUR_LANDING_OR_SIGNUP_URL]
 
-#NGX #NigerianStocks #Investing #EquiScan #NigerianExchange
+#NGX #NigerianStocks #Investing #TickerNG #NigerianExchange
 
 ---
 

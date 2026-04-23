@@ -1,5 +1,5 @@
 {
-  "name": "equiscan",
+  "name": "tickerng",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,13 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.71",
     "@anthropic-ai/sdk": "^0.32.0",
+    "@clerk/nextjs": "^7.2.5",
+    "@langfuse/otel": "^5.2.0",
+    "@langfuse/tracing": "^5.2.0",
+    "@opentelemetry/sdk-trace-node": "^2.7.0",
+    "ai": "^6.0.168",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.6.0",
     "drizzle-orm": "^0.38.0",
@@ -23,7 +29,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.0",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "stripe": "^22.0.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

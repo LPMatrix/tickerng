@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { reportShare as reportShareTable, report as reportTable } from "@/db/schema";
 import { eq, and, gt, or, isNull } from "drizzle-orm";
 
-/** GET: fetch report by share token (public, read-only). Returns 404 if expired/revoked/invalid. */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
@@ -43,13 +42,12 @@ export async function GET(
   return NextResponse.json(reportRow);
 }
 
-/** DELETE: revoke this share link (auth required; must own the report). */
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { token } = await params;
@@ -69,7 +67,7 @@ export async function DELETE(
     .from(reportTable)
     .where(eq(reportTable.id, share.reportId))
     .limit(1);
-  if (!reportRow || reportRow.userId !== session.user.id) {
+  if (!reportRow || reportRow.userId !== userId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   await db

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { report as reportTable, reportShare as reportShareTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -12,20 +12,19 @@ function getBaseUrl(request: NextRequest): string {
   return `${proto}://${host}`;
 }
 
-/** GET: fetch a single report by id (only if owned by current user) */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
   const [row] = await db
     .select()
     .from(reportTable)
-    .where(and(eq(reportTable.id, id), eq(reportTable.userId, session.user.id)))
+    .where(and(eq(reportTable.id, id), eq(reportTable.userId, userId)))
     .limit(1);
   if (!row) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -33,19 +32,18 @@ export async function GET(
   return NextResponse.json(row);
 }
 
-/** DELETE: remove a report owned by the current user (share rows cascade). */
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
   const result = await db
     .delete(reportTable)
-    .where(and(eq(reportTable.id, id), eq(reportTable.userId, session.user.id)))
+    .where(and(eq(reportTable.id, id), eq(reportTable.userId, userId)))
     .returning({ id: reportTable.id });
   if (result.length === 0) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -53,20 +51,19 @@ export async function DELETE(
   return new NextResponse(null, { status: 204 });
 }
 
-/** POST: create a read-only share link for this report (owner only). Body: { expiresInDays?: number } */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id: reportId } = await params;
   const [reportRow] = await db
     .select()
     .from(reportTable)
-    .where(and(eq(reportTable.id, reportId), eq(reportTable.userId, session.user.id)))
+    .where(and(eq(reportTable.id, reportId), eq(reportTable.userId, userId)))
     .limit(1);
   if (!reportRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

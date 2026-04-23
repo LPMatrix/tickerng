@@ -41,7 +41,7 @@ export default function SharedReportPage({
         <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-[var(--color-ink)]">
             <BarChart3 className="h-6 w-6 text-[var(--color-accent)]" />
-            <span className="font-display text-lg font-semibold">EquiScan</span>
+            <span className="font-display text-lg font-semibold">TickerNG</span>
           </Link>
         </header>
         <div className="mx-auto max-w-3xl px-4 py-16 text-center">
@@ -58,7 +58,7 @@ export default function SharedReportPage({
             href="/"
             className="mt-6 inline-flex items-center gap-2 text-[var(--color-accent)] hover:underline"
           >
-            Go to EquiScan
+            Go to TickerNG
           </Link>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function SharedReportPage({
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-[var(--color-ink)]">
             <BarChart3 className="h-6 w-6 text-[var(--color-accent)]" />
-            <span className="font-display text-lg font-semibold">EquiScan</span>
+            <span className="font-display text-lg font-semibold">TickerNG</span>
           </Link>
           <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs text-[var(--color-mute)]">
             Shared report
@@ -103,7 +103,7 @@ export default function SharedReportPage({
         </div>
         <p className="mt-6 text-center text-sm text-[var(--color-mute)]">
           <Link href="/" className="text-[var(--color-accent)] hover:underline">
-            Create your own reports with EquiScan
+            Create your own reports with TickerNG
           </Link>
         </p>
       </main>

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { BarChart3, LogOut, User, ChevronRight } from "lucide-react";
 
 export function Header() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur supports-[backdrop-filter]:bg-[var(--color-bg)]/80">
@@ -17,15 +18,15 @@ export function Header() {
               <BarChart3 className="h-5 w-5" />
             </div>
             <span className="hidden font-display text-xl font-semibold tracking-tight text-[var(--color-ink)] sm:block">
-              EquiScan
+              TickerNG
             </span>
           </Link>
-          
+
           <div className="hidden h-4 w-px bg-[var(--color-border-strong)] sm:block" />
-          
+
           <nav className="hidden items-center gap-1 text-sm sm:flex">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-[var(--color-mute)] hover:text-[var(--color-ink)] transition-colors"
             >
               Home
@@ -37,19 +38,19 @@ export function Header() {
 
         {/* User Actions */}
         <div className="flex items-center gap-3">
-          {status === "authenticated" && session?.user ? (
+          {isLoaded && user ? (
             <>
               <div className="hidden items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5 sm:flex">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
                   <User className="h-3.5 w-3.5" />
                 </div>
                 <span className="max-w-[150px] truncate text-sm text-[var(--color-ink)]">
-                  {session.user.email}
+                  {user.primaryEmailAddress?.emailAddress}
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => signOut({ callbackUrl: "/signin" })}
+                onClick={() => signOut({ redirectUrl: "/signin" })}
                 className="flex items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-mute)] transition-all hover:border-[var(--color-accent)]/30 hover:text-[var(--color-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                 title="Sign out"
               >

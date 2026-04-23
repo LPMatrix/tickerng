@@ -1,6 +1,6 @@
 # X (Twitter) Thread — How I Research Any NGX Stock in Under 60 Seconds
 
-**Use for:** Founder-led launch; drive clicks to EquiScan signup.  
+**Use for:** Founder-led launch; drive clicks to TickerNG signup.  
 **Best time:** Weekdays 9–10 AM or 7–9 PM (WAT).  
 **Format:** Numbered thread; front-load value; link in last tweet.
 
@@ -48,7 +48,7 @@ Same 5 steps — financials, valuation, risks, catalysts, verdict. Just takes lo
 ---
 
 **Notes:**
-- Replace [YOUR_SIGNUP_URL] with your actual signup or landing URL (e.g. equiscan.app/signup).
+- Replace [YOUR_SIGNUP_URL] with your actual signup or landing URL (e.g. tickerng.app/signup).
 - Replace [BLOG_URL/...] when the blog post is published.
 - Add a demo GIF or screenshot in tweet 4 or 5 if you have one (2–3x engagement).
 - Optional: Pin this thread to your profile for 1–2 weeks post-launch.

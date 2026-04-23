@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, DM_Sans } from "next/font/google";
-import { Providers } from "@/components/Providers";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -15,19 +15,19 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://equiscan.app";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://tickerng.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "EquiScan — NGX Research Tool",
-    template: "%s | EquiScan",
+    default: "TickerNG — NGX Research Tool",
+    template: "%s | TickerNG",
   },
   description: "Fast, structured stock research on the Nigerian Exchange. Discovery and verification reports powered by AI.",
   openGraph: {
     type: "website",
     locale: "en",
-    siteName: "EquiScan",
+    siteName: "TickerNG",
   },
   twitter: {
     card: "summary_large_image",
@@ -45,10 +45,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
-      <body className="min-h-screen font-body">
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
+        <body className="min-h-screen font-body">{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
