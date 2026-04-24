@@ -68,7 +68,15 @@ export default function ResearchPage() {
         setUsageVersion((v) => v + 1);
         return;
       }
-      if (!res.ok) throw new Error("Research request failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg =
+          typeof data.error === "string"
+            ? data.error
+            : `Request failed (${res.status}). Check Vercel env: OPENROUTER_API_KEY, TAVILY_API_KEY, Clerk, and database.`;
+        setReport(`## Error\n\n${msg}`);
+        return;
+      }
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) {
@@ -96,8 +104,13 @@ export default function ResearchPage() {
           if (effectiveMode === "verification") setUsageVersion((v) => v + 1);
         }
       }
-    } catch {
-      setReport("## Error\n\nUnable to run research. Ensure the API route is implemented and Claude API is configured.");
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : "Network or stream error";
+      setReport(
+        `## Error\n\n${detail}\n\n` +
+          `If this persists on production, check **Vercel → Project → Settings → Environment Variables** for ` +
+          `OPENROUTER_API_KEY, TAVILY_API_KEY, and Turso/Clerk. Inspect **Functions** logs for the real error.`
+      );
     } finally {
       setIsRunning(false);
     }
