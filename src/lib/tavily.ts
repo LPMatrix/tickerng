@@ -1,3 +1,5 @@
+import type { SpecialistKey } from "@/lib/specialists";
+
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
 
 export type TavilySearchDepth = "basic" | "advanced" | "fast" | "ultra-fast";
@@ -22,6 +24,8 @@ export const NGX_PRIORITY_DOMAINS = [
   "proshare.ng",
   "proshare.com",
   "businessday.ng",
+  "businesspost.ng",
+  "thecable.ng",
   "punchng.com",
   "guardian.ng",
   "vanguardngr.com",
@@ -30,7 +34,12 @@ export const NGX_PRIORITY_DOMAINS = [
   "investdata.com.ng",
   "cbn.gov.ng",
   "nipc.gov.ng",
+  "fmdqgroup.com",
+  "sec.gov.ng",
 ] as const;
+
+/** NGX & exchange sources only — for filing / disclosure retrieval. */
+export const NGX_EXCHANGE_DOMAINS = ["ngxgroup.com", "fmdqgroup.com"] as const;
 
 /** Often return homonym tickers (US/EU) instead of NGX listings. */
 export const GLOBAL_TICKER_NOISE_DOMAINS = [
@@ -80,7 +89,10 @@ export async function tavilySearchToMarkdown(
   };
 
   if (options?.timeRange) body.time_range = options.timeRange;
-  if (options?.country && topic === "general") body.country = options.country;
+  // Country applies to general and finance topic searches (Tavily filters by market context).
+  if (options?.country && (topic === "general" || topic === "finance")) {
+    body.country = options.country;
+  }
   if (options?.includeDomains?.length) {
     body.include_domains = options.includeDomains.slice(0, 300);
   }
@@ -122,32 +134,62 @@ export async function tavilySearchToMarkdown(
   return lines.join("\n").trimEnd() + "\n";
 }
 
-function narrowQuery(ticker: string, key: string): string {
+/** "advanced" costs more; use for filing/market/sentiment-deep. Override all with TAVILY_SEARCH_DEPTH=advanced|basic. */
+function tavilyDepth(phase: "filing" | "market" | "sentimentDeep" | "default"): TavilySearchDepth {
+  const global = process.env.TAVILY_SEARCH_DEPTH;
+  if (global === "advanced" || global === "basic") return global;
+  if (global === "fast" || global === "ultra-fast") return global;
+  if (phase === "filing" || phase === "market" || phase === "sentimentDeep") return "advanced";
+  return "basic";
+}
+
+function narrowQuery(ticker: string, key: SpecialistKey): string {
   const t = ticker.toUpperCase();
   switch (key) {
     case "fundamentals":
-      return `${t} NGX Nigerian Stock Exchange listed company annual report interim results revenue profit EPS market cap share price volume`;
+      return `${t} NGX "Nigerian Stock Exchange" listed company annual report interim results IFRS audited "facts behind the figures" revenue profit EPS EBITDA dividend market cap share price naira volume doclib`;
     case "news":
-      return `${t} NGX Nigeria stock dividend AGM bonus split results announcement corporate action`;
+      return `${t} NGX Nigeria stock dividend AGM bonus split rights issue results announcement corporate action Notices Circular`;
     case "sentiment":
-      return `${t} NGX Nigeria stock analyst equity research buy hold sell target price`;
-    default:
+      return `${t} NGX Nigeria stock analyst equity research "price target" buy hold sell consensus`;
+    case "macro":
       return `${t} NGX Nigeria`;
   }
 }
 
-/** Strong NGX disambiguation — many tickers exist on foreign venues with the same symbol. */
-function wideQuery(ticker: string, key: string): string {
+/**
+ * NGX & company filings: targets doclib, annual/audited text where indexed.
+ * Company legal name (e.g. "Lafarge") often appears in AR titles alongside ticker.
+ */
+function filingsExchangeQuery(ticker: string): string {
   const t = ticker.toUpperCase();
-  const ngx = `(NGX OR "Nigerian Exchange" OR "NSE Nigeria" OR "Lagos" OR ngxgroup.com OR "quoted company Nigeria")`;
+  return `${t} ("annual report" OR "interim results" OR "unaudited results" OR "audited financial" OR "full year" OR IFRS) (revenue OR "profit after tax" OR EPS OR "total assets" OR "shareholders' funds" OR "market capitalisation" OR naira) NGX "Nigerian Exchange" financial statements 2023 2024 2025`;
+}
+
+/** Price, mcap, liquidity — disambiguate from foreign homonyms. */
+function marketDataQuery(ticker: string): string {
+  const t = ticker.toUpperCase();
+  return `"${t}" (NGX OR "Nigerian Exchange" OR "Lagos" OR "NSE:" OR naira) share price "market capitalisation" OR "market cap" "volume traded" "closing price" OR "last done" OR "YTD" equity`;
+}
+
+/** Deeper sell-side & terminal-style mentions (still web-based). */
+function sentimentDeepQuery(ticker: string): string {
+  const t = ticker.toUpperCase();
+  return `"${t}" (Nigeria OR NGX OR "Lagos bourse" OR naira) ("equity research" OR "initiating coverage" OR "price target" OR "Earnings" OR "FY" OR "Q1" OR "Q2" OR "Q3" OR "Q4" OR "Buy" OR "Hold" OR "Sell" OR "Overweight" OR "Underweight") (analyst OR broker OR research)`;
+}
+
+/** Strong NGX disambiguation — many tickers exist on foreign venues with the same symbol. */
+function wideQuery(ticker: string, key: SpecialistKey): string {
+  const t = ticker.toUpperCase();
+  const ngx = `(NGX OR "Nigerian Exchange" OR "NSE Nigeria" OR "Lagos" OR ngxgroup.com OR "quoted company Nigeria" OR naira)`;
   switch (key) {
     case "fundamentals":
-      return `"${t}" ${ngx} stock market capitalisation financial statements P/E P/B earnings shares traded`;
+      return `"${t}" ${ngx} (financial statements OR "P/E" OR "P/B" OR ROE OR dividend yield OR "shares in issue" OR "market cap" OR "share price" OR "volume" OR "free float" OR "closing bid")`;
     case "news":
-      return `"${t}" ${ngx} stock news earnings dividend AGM 2025 2026`;
+      return `"${t}" ${ngx} (M&A OR acquisition OR "board changes" OR CEO OR dividend OR "AGM" OR "EGM" OR 2024 OR 2025 OR 2026) stock news corporate`;
     case "sentiment":
-      return `"${t}" ${ngx} stock analyst report rating research Nigeria`;
-    default:
+      return `"${t}" ${ngx} (stock OR equity OR shares) (analyst OR consensus OR "research note" OR rating OR outlook) Nigeria`;
+    case "macro":
       return `"${t}" ${ngx}`;
   }
 }
@@ -160,7 +202,7 @@ function macroQuery(ticker: string): string {
 export async function buildSpecialistWebContext(
   apiKey: string,
   ticker: string,
-  key: string
+  key: SpecialistKey
 ): Promise<string> {
   if (key === "macro") {
     return tavilySearchToMarkdown(apiKey, macroQuery(ticker), {
@@ -176,12 +218,48 @@ export async function buildSpecialistWebContext(
   const noise = [...GLOBAL_TICKER_NOISE_DOMAINS];
   const t = ticker.toUpperCase();
 
+  if (key === "fundamentals") {
+    const [narrow, wide, filings, market] = await Promise.all([
+      tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
+        topic: "finance",
+        maxResults: 12,
+        searchDepth: tavilyDepth("default"),
+        includeDomains: [...NGX_PRIORITY_DOMAINS],
+        sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
+      }),
+      tavilySearchToMarkdown(apiKey, wideQuery(ticker, key), {
+        topic: "finance",
+        country: "nigeria",
+        maxResults: 12,
+        searchDepth: tavilyDepth("default"),
+        excludeDomains: noise,
+        sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
+      }),
+      tavilySearchToMarkdown(apiKey, filingsExchangeQuery(ticker), {
+        topic: "finance",
+        maxResults: 15,
+        searchDepth: tavilyDepth("filing"),
+        includeDomains: [...NGX_EXCHANGE_DOMAINS],
+        sectionHeading: "Web search (C): NGX & FMDQ — filings, reports, key figures",
+      }),
+      tavilySearchToMarkdown(apiKey, marketDataQuery(ticker), {
+        topic: "finance",
+        maxResults: 10,
+        searchDepth: tavilyDepth("market"),
+        country: "nigeria",
+        excludeDomains: noise,
+        sectionHeading: "Web search (D): market data — price, cap, volume (NGX context)",
+      }),
+    ]);
+    return `${narrow}\n${wide}\n${filings}\n${market}`;
+  }
+
   if (key === "news") {
     const [narrow, wide, recent] = await Promise.all([
       tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
         topic: "general",
         maxResults: 8,
-        searchDepth: "basic",
+        searchDepth: tavilyDepth("default"),
         includeDomains: [...NGX_PRIORITY_DOMAINS],
         sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
       }),
@@ -189,14 +267,14 @@ export async function buildSpecialistWebContext(
         topic: "general",
         country: "nigeria",
         maxResults: 10,
-        searchDepth: "basic",
+        searchDepth: tavilyDepth("default"),
         excludeDomains: noise,
         sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
       }),
       tavilySearchToMarkdown(apiKey, `${t} Nigeria NGX listed company stock news`, {
         topic: "news",
         maxResults: 7,
-        searchDepth: "basic",
+        searchDepth: tavilyDepth("default"),
         timeRange: "month",
         excludeDomains: noise,
         sectionHeading: "Web search (C): news topic (recent)",
@@ -205,25 +283,36 @@ export async function buildSpecialistWebContext(
     return `${narrow}\n${wide}\n${recent}`;
   }
 
-  const [narrow, wide] = await Promise.all([
-    tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
-      topic: "general",
-      maxResults: 8,
-      searchDepth: "basic",
-      includeDomains: [...NGX_PRIORITY_DOMAINS],
-      sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
-    }),
-    tavilySearchToMarkdown(apiKey, wideQuery(ticker, key), {
-      topic: "general",
-      country: "nigeria",
-      maxResults: 10,
-      searchDepth: "basic",
-      excludeDomains: noise,
-      sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
-    }),
-  ]);
+  if (key === "sentiment") {
+    const [narrow, wide, deep] = await Promise.all([
+      tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
+        topic: "general",
+        maxResults: 8,
+        searchDepth: tavilyDepth("default"),
+        includeDomains: [...NGX_PRIORITY_DOMAINS],
+        sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
+      }),
+      tavilySearchToMarkdown(apiKey, wideQuery(ticker, key), {
+        topic: "general",
+        country: "nigeria",
+        maxResults: 10,
+        searchDepth: tavilyDepth("default"),
+        excludeDomains: noise,
+        sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
+      }),
+      tavilySearchToMarkdown(apiKey, sentimentDeepQuery(ticker), {
+        topic: "finance",
+        maxResults: 10,
+        searchDepth: tavilyDepth("sentimentDeep"),
+        country: "nigeria",
+        excludeDomains: noise,
+        sectionHeading: "Web search (C): analyst, coverage, and rating language",
+      }),
+    ]);
+    return `${narrow}\n${wide}\n${deep}`;
+  }
 
-  return `${narrow}\n${wide}`;
+  throw new Error(`unhandled specialist: ${key}`);
 }
 
 export function discoveryTavilyQueries(userQuery: string, includeMacro: boolean): string[] {
@@ -240,7 +329,7 @@ export function discoveryTavilyOptions(
   index: number
 ): Omit<TavilySearchOptions, "sectionHeading"> {
   return {
-    maxResults: index === 0 ? 10 : 8,
+    maxResults: index === 0 ? 12 : 8,
     topic: "general",
     searchDepth: "basic",
     country: "nigeria",

@@ -26,7 +26,9 @@ const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
 });
-const MODEL = openrouter("anthropic/claude-sonnet-4.6");
+const OPENROUTER_MODEL_ID =
+  process.env.OPENROUTER_MODEL?.trim() || "anthropic/claude-sonnet-4.6";
+const MODEL = openrouter(OPENROUTER_MODEL_ID);
 
 function normalizeTicker(raw: string): string {
   return raw.trim().replace(/\s+/g, "").toUpperCase();
