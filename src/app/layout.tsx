@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en",
     siteName: "TickerNG",
+    url: baseUrl,
   },
   twitter: {
     card: "summary_large_image",

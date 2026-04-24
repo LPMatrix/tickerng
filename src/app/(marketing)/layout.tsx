@@ -25,6 +25,7 @@ const jsonLd = {
       "@id": `${baseUrl}/#organization`,
       name: "TickerNG",
       url: baseUrl,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/icon.png` },
       description: "Full NGX stock research in under 60 seconds. Your personal NGX analyst, on demand.",
     },
     {
