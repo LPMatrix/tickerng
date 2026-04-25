@@ -21,6 +21,7 @@
     "@langfuse/tracing": "^5.2.0",
     "@libsql/client": "^0.17.3",
     "@opentelemetry/sdk-trace-node": "^2.7.0",
+    "@vercel/analytics": "^2.0.1",
     "ai": "^6.0.168",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.38.0",
