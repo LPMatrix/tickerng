@@ -96,6 +96,8 @@ Required — always include this section. Cover:
 
 You are in DISCOVERY mode. The user will supply a natural-language query (e.g. "best banking stocks right now", "NGX stocks with strong dividend"). Your task is to produce a short discovery report with the following structure. Use only the web search excerpts in the user message for factual claims about NGX data and sector momentum.${includeMacro ? " Include macro context (CBN, inflation, NGX index) as the first section." : " Do not include a separate Macro Context section."}
 
+When the user message includes **Per-ticker web excerpts** blocks, prefer those blocks for concrete per-stock metrics (price, volume, market cap, P/E, filing snippets). Use the initial broad web excerpts for thematic fit, sector context, and any names that do not appear in the per-ticker blocks.
+
 ## Required report structure (use these exact section headers)
 ${macroSection}
 List exactly 3–5 NGX stocks. Only include stocks with average daily volume above 10,000 shares/day — if a compelling stock has uncertain liquidity data, include it but flag the uncertainty explicitly.

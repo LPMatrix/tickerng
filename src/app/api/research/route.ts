@@ -16,9 +16,11 @@ import {
 import {
   tavilySearchToMarkdown,
   buildSpecialistWebContext,
+  buildDiscoveryTickerEnrichmentMarkdown,
   discoveryTavilyQueries,
   discoveryTavilyOptions,
 } from "@/lib/tavily";
+import { extractDiscoveryCandidateTickers } from "@/lib/discovery-enrichment";
 import { langfuseSpanProcessor } from "@/instrumentation";
 import { getMonthlyVerificationCount, FREE_MONTHLY_VERIFICATIONS, PRO_PLAN_SLUG } from "@/lib/billing";
 
@@ -165,7 +167,34 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
         })
       )
     );
-    const userMessage = `${baseUserMessage}\n\n${discoveryBlocks.join("\n\n")}`;
+    const initialWebMarkdown = discoveryBlocks.join("\n\n");
+
+    let userMessage = `${baseUserMessage}\n\n${initialWebMarkdown}`;
+    let discoveryEnrichmentTickers = "";
+    try {
+      const candidateTickers = await extractDiscoveryCandidateTickers(
+        MODEL,
+        query,
+        initialWebMarkdown
+      );
+      if (candidateTickers.length > 0) {
+        discoveryEnrichmentTickers = candidateTickers.join(",");
+        const perTicker = await Promise.all(
+          candidateTickers.map(async (t) => {
+            try {
+              const md = await buildDiscoveryTickerEnrichmentMarkdown(tavilyApiKey, t);
+              return `### Per-ticker excerpts: ${t}\n\n${md}`;
+            } catch (e) {
+              const m = e instanceof Error ? e.message : String(e);
+              return `### Per-ticker excerpts: ${t}\n\n_(Enrichment failed: ${m})_`;
+            }
+          })
+        );
+        userMessage = `${baseUserMessage}\n\n${initialWebMarkdown}\n\n---\n\n**Per-ticker web excerpts** (prefer these blocks for price, volume, market cap, P/E, and filing snippets when present; the sections above are broader discovery context):\n\n${perTicker.join("\n\n")}`;
+      }
+    } catch {
+      /* fall back to single-stage discovery */
+    }
 
     const result = streamText({
       model: MODEL,
@@ -175,7 +204,10 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
       experimental_telemetry: {
         isEnabled: true,
         functionId: "discovery",
-        metadata: { query },
+        metadata: {
+          query,
+          ...(discoveryEnrichmentTickers ? { discoveryEnrichmentTickers } : {}),
+        },
       },
       onError({ error }) {
         console.error("[discovery stream error]", error);

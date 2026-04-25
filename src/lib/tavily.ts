@@ -199,6 +199,57 @@ function macroQuery(ticker: string): string {
   return `Nigeria CBN monetary policy rate MPR headline inflation naira exchange rate NGX All Share Index Nigerian capital market listed equities context for ticker ${t}`;
 }
 
+/**
+ * Four parallel Tavily passes aligned with verification “fundamentals” retrieval
+ * (priority sources, wide Nigeria, NGX/FMDQ filings, market/liquidity).
+ * Used by specialists and by Discovery second-stage enrichment.
+ */
+async function fundamentalsTavilyMarkdown(apiKey: string, ticker: string): Promise<string> {
+  const noise = [...GLOBAL_TICKER_NOISE_DOMAINS];
+  const key: SpecialistKey = "fundamentals";
+  const [narrow, wide, filings, market] = await Promise.all([
+    tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
+      topic: "finance",
+      maxResults: 12,
+      searchDepth: tavilyDepth("default"),
+      includeDomains: [...NGX_PRIORITY_DOMAINS],
+      sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
+    }),
+    tavilySearchToMarkdown(apiKey, wideQuery(ticker, key), {
+      topic: "finance",
+      country: "nigeria",
+      maxResults: 12,
+      searchDepth: tavilyDepth("default"),
+      excludeDomains: noise,
+      sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
+    }),
+    tavilySearchToMarkdown(apiKey, filingsExchangeQuery(ticker), {
+      topic: "finance",
+      maxResults: 15,
+      searchDepth: tavilyDepth("filing"),
+      includeDomains: [...NGX_EXCHANGE_DOMAINS],
+      sectionHeading: "Web search (C): NGX & FMDQ — filings, reports, key figures",
+    }),
+    tavilySearchToMarkdown(apiKey, marketDataQuery(ticker), {
+      topic: "finance",
+      maxResults: 10,
+      searchDepth: tavilyDepth("market"),
+      country: "nigeria",
+      excludeDomains: noise,
+      sectionHeading: "Web search (D): market data — price, cap, volume (NGX context)",
+    }),
+  ]);
+  return `${narrow}\n${wide}\n${filings}\n${market}`;
+}
+
+/** Per-ticker fundamentals-style Tavily bundle for Discovery (after candidate tickers are known). */
+export async function buildDiscoveryTickerEnrichmentMarkdown(
+  apiKey: string,
+  ticker: string
+): Promise<string> {
+  return fundamentalsTavilyMarkdown(apiKey, ticker);
+}
+
 export async function buildSpecialistWebContext(
   apiKey: string,
   ticker: string,
@@ -219,39 +270,7 @@ export async function buildSpecialistWebContext(
   const t = ticker.toUpperCase();
 
   if (key === "fundamentals") {
-    const [narrow, wide, filings, market] = await Promise.all([
-      tavilySearchToMarkdown(apiKey, narrowQuery(ticker, key), {
-        topic: "finance",
-        maxResults: 12,
-        searchDepth: tavilyDepth("default"),
-        includeDomains: [...NGX_PRIORITY_DOMAINS],
-        sectionHeading: "Web search (A): NGX & Nigerian financial / news sources",
-      }),
-      tavilySearchToMarkdown(apiKey, wideQuery(ticker, key), {
-        topic: "finance",
-        country: "nigeria",
-        maxResults: 12,
-        searchDepth: tavilyDepth("default"),
-        excludeDomains: noise,
-        sectionHeading: "Web search (B): Nigeria-wide (homonym-safe query)",
-      }),
-      tavilySearchToMarkdown(apiKey, filingsExchangeQuery(ticker), {
-        topic: "finance",
-        maxResults: 15,
-        searchDepth: tavilyDepth("filing"),
-        includeDomains: [...NGX_EXCHANGE_DOMAINS],
-        sectionHeading: "Web search (C): NGX & FMDQ — filings, reports, key figures",
-      }),
-      tavilySearchToMarkdown(apiKey, marketDataQuery(ticker), {
-        topic: "finance",
-        maxResults: 10,
-        searchDepth: tavilyDepth("market"),
-        country: "nigeria",
-        excludeDomains: noise,
-        sectionHeading: "Web search (D): market data — price, cap, volume (NGX context)",
-      }),
-    ]);
-    return `${narrow}\n${wide}\n${filings}\n${market}`;
+    return fundamentalsTavilyMarkdown(apiKey, ticker);
   }
 
   if (key === "news") {
