@@ -8,6 +8,10 @@ const isPublicRoute = createRouteMatcher([
   "/r/(.*)",
   "/privacy",
   "/terms",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/opengraph-image",
+  "/twitter-image",
   "/api/share/(.*)",
   "/api/webhooks/(.*)",
 ]);
