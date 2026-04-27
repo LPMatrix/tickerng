@@ -73,7 +73,7 @@ export default function ResearchPage() {
         const msg =
           typeof data.error === "string"
             ? data.error
-            : `Request failed (${res.status}). Check Vercel env: OPENROUTER_API_KEY, TAVILY_API_KEY, Clerk, and database.`;
+            : "Something went wrong. Please try again. If the problem continues, contact support.";
         setReport(`## Error\n\n${msg}`);
         return;
       }
@@ -105,11 +105,13 @@ export default function ResearchPage() {
         }
       }
     } catch (e) {
-      const detail = e instanceof Error ? e.message : "Network or stream error";
+      const isNetwork = e instanceof TypeError && e.message === "Failed to fetch";
       setReport(
-        `## Error\n\n${detail}\n\n` +
-          `If this persists on production, check **Vercel → Project → Settings → Environment Variables** for ` +
-          `OPENROUTER_API_KEY, TAVILY_API_KEY, and Turso/Clerk. Inspect **Functions** logs for the real error.`
+        `## Error\n\n${
+          isNetwork
+            ? "We couldn't reach the server. Check your connection and try again."
+            : "Something went wrong. Please try again. If the problem continues, contact support."
+        }`
       );
     } finally {
       setIsRunning(false);

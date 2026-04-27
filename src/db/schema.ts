@@ -10,6 +10,17 @@ export const report = sqliteTable("report", {
   createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
 });
 
+/** Paystack subscription record keyed by Clerk user ID. */
+export const userSubscription = sqliteTable("userSubscription", {
+  userId: text("userId").primaryKey(),
+  paystackCustomerCode: text("paystackCustomerCode"),
+  paystackSubscriptionCode: text("paystackSubscriptionCode"),
+  paystackEmailToken: text("paystackEmailToken"),
+  status: text("status").notNull().default("free"), // "free" | "active" | "cancelled"
+  currentPeriodEnd: integer("currentPeriodEnd", { mode: "timestamp_ms" }),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" }).notNull(),
+});
+
 /** Share tokens for read-only report links. Token is secret; optional expiry and revocable. */
 export const reportShare = sqliteTable("reportShare", {
   id: text("id").primaryKey(),

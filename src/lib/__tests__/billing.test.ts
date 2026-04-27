@@ -9,7 +9,6 @@ vi.mock("@/db", () => ({
 import { db } from "@/db";
 import {
   FREE_MONTHLY_VERIFICATIONS,
-  PRO_PLAN_SLUG,
   getMonthlyVerificationCount,
 } from "../billing";
 
@@ -23,12 +22,6 @@ describe("FREE_MONTHLY_VERIFICATIONS", () => {
   });
 });
 
-describe("PRO_PLAN_SLUG", () => {
-  it("is a non-empty string", () => {
-    expect(typeof PRO_PLAN_SLUG).toBe("string");
-    expect(PRO_PLAN_SLUG.length).toBeGreaterThan(0);
-  });
-});
 
 describe("getMonthlyVerificationCount", () => {
   it("returns the count from the DB", async () => {

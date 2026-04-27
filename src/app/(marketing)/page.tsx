@@ -413,7 +413,7 @@ export default function LandingPage() {
               <div className="mb-6">
                 <h3 className="font-display text-xl font-semibold text-[var(--color-ink)]">Free</h3>
                 <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">
-                  $0
+                  ₦0
                   <span className="text-base font-normal text-[var(--color-mute)]"> / month</span>
                 </p>
               </div>
@@ -451,7 +451,7 @@ export default function LandingPage() {
                 <div className="mb-6">
                   <h3 className="font-display text-xl font-semibold text-[var(--color-ink)]">Unlimited</h3>
                   <p className="mt-1 text-3xl font-semibold text-[var(--color-ink)]">
-                    $15
+                    ₦10,000
                     <span className="text-base font-normal text-[var(--color-mute)]"> / month</span>
                   </p>
                   <p className="mt-2 text-sm text-[var(--color-mute)]">

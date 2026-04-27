@@ -22,7 +22,7 @@ import {
 } from "@/lib/tavily";
 import { extractDiscoveryCandidateTickers } from "@/lib/discovery-enrichment";
 import { langfuseSpanProcessor } from "@/instrumentation";
-import { getMonthlyVerificationCount, FREE_MONTHLY_VERIFICATIONS, PRO_PLAN_SLUG } from "@/lib/billing";
+import { checkVerificationQuota } from "@/lib/billing";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -74,22 +74,24 @@ async function runSpecialist(
 }
 
 const handler = async (request: NextRequest): Promise<NextResponse> => {
-  const { userId, has } = await auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   if (!process.env.OPENROUTER_API_KEY) {
+    console.error("[research] Service misconfiguration: language model provider is not available");
     return NextResponse.json(
-      { error: "OPENROUTER_API_KEY is not configured" },
+      { error: "Research is temporarily unavailable. Please try again in a few minutes." },
       { status: 503 }
     );
   }
 
   const tavilyApiKey = process.env.TAVILY_API_KEY?.trim();
   if (!tavilyApiKey) {
+    console.error("[research] Service misconfiguration: web search provider is not available");
     return NextResponse.json(
-      { error: "TAVILY_API_KEY is not configured" },
+      { error: "Research is temporarily unavailable. Please try again in a few minutes." },
       { status: 503 }
     );
   }
@@ -118,15 +120,12 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
         );
       }
 
-      const isPro = has({ plan: PRO_PLAN_SLUG });
-      if (!isPro) {
-        const used = await getMonthlyVerificationCount(userId);
-        if (used >= FREE_MONTHLY_VERIFICATIONS) {
-          return NextResponse.json(
-            { error: "Monthly verification limit reached", quota: { limit: FREE_MONTHLY_VERIFICATIONS, used } },
-            { status: 402 }
-          );
-        }
+      const quota = await checkVerificationQuota(userId);
+      if (!quota.allowed) {
+        return NextResponse.json(
+          { error: "Monthly verification limit reached", quota: { limit: quota.limit, used: quota.used } },
+          { status: 402 }
+        );
       }
 
       const results = await Promise.all(
@@ -217,14 +216,18 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
     after(async () => await langfuseSpanProcessor?.forceFlush());
     return result.toTextStreamResponse() as NextResponse;
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Research request failed";
+    console.error("[research] Unhandled error", err);
     const status =
       err && typeof err === "object" && "status" in err && typeof (err as { status: number }).status === "number"
         ? (err as { status: number }).status
         : 500;
+    const code = status >= 400 && status < 600 ? status : 500;
     return NextResponse.json(
-      { error: message },
-      { status: status >= 400 && status < 600 ? status : 500 }
+      {
+        error:
+          "We couldn't complete that research request. Please try again. If it keeps happening, contact support.",
+      },
+      { status: code }
     );
   }
 };
