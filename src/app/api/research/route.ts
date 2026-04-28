@@ -57,10 +57,10 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
       }
     }
 
-    const agentUrl = resolveResearchAgentEndpoint();
+    const agentUrl = resolveResearchAgentEndpoint(request);
     if (!agentUrl) {
       console.error(
-        "[research] Research agent URL could not be resolved. On Vercel, VERCEL_URL should be set; otherwise set RESEARCH_AGENT_URL or run the local Python agent (npm run dev)."
+        "[research] Research agent URL could not be resolved. Set RESEARCH_AGENT_URL or run the local Python agent (npm run dev)."
       );
       return NextResponse.json(
         {
@@ -70,11 +70,23 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
       );
     }
 
+    const agentHeaders = new Headers({
+      "Content-Type": "application/json",
+    });
+    const cookie = request.headers.get("cookie");
+    if (cookie) agentHeaders.set("cookie", cookie);
+    const authorization = request.headers.get("authorization");
+    if (authorization) agentHeaders.set("authorization", authorization);
+    const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+    if (bypass) {
+      agentHeaders.set("x-vercel-protection-bypass", bypass);
+    }
+
     let upstream: Response;
     try {
       upstream = await fetch(agentUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: agentHeaders,
         body: JSON.stringify({ mode, query, includeMacroContext }),
       });
     } catch (err: unknown) {

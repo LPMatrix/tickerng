@@ -1,13 +1,14 @@
+import type { NextRequest } from "next/server";
+
 /**
  * Resolves where POST /api/research should forward the research payload.
  *
  * - Optional `RESEARCH_AGENT_URL`: external agent origin (POST `/`). Use for Railway/Fly/etc.
- * - Vercel (preview/production): same-deployment Python serverless function at `/api/research-agent`.
- * - Local `next dev`: standalone agent from `npm run dev` → `http://127.0.0.1:8788/` (serve.py).
- *
- * `vercel dev` sets `VERCEL` so we target `/api/research-agent` instead of localhost.
+ * - Vercel (preview/production or `vercel dev`): same-deployment Python at `{request.origin}/api/research-agent`.
+ *   Using the **incoming request origin** keeps Clerk cookies aligned (preview URLs, custom domains).
+ * - Local `next dev` (no `VERCEL`): `http://127.0.0.1:8788/` (`serve.py`).
  */
-export function resolveResearchAgentEndpoint(): string | null {
+export function resolveResearchAgentEndpoint(request: NextRequest): string | null {
   const explicit = process.env.RESEARCH_AGENT_URL?.trim();
   if (explicit) {
     return `${explicit.replace(/\/$/, "")}/`;
@@ -19,13 +20,5 @@ export function resolveResearchAgentEndpoint(): string | null {
     return `http://127.0.0.1:${port}/`;
   }
 
-  const vercelUrl = process.env.VERCEL_URL?.trim();
-  if (vercelUrl) {
-    const local =
-      vercelUrl.startsWith("localhost") || vercelUrl.startsWith("127.0.0.1");
-    const origin = `${local ? "http" : "https"}://${vercelUrl}`;
-    return `${origin}/api/research-agent`;
-  }
-
-  return null;
+  return `${request.nextUrl.origin}/api/research-agent`;
 }

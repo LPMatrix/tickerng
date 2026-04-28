@@ -196,7 +196,9 @@ npm test
 ## Production notes
 
 - **Vercel:** Set **`OPENROUTER_API_KEY`** and **`TAVILY_API_KEY`** on the project—they apply to **both** Node and the Python function. **`api/research-agent.py`** runs at **`/api/research-agent`**; **`RESEARCH_AGENT_URL`** is **not** required unless the agent is deployed separately (Railway, Fly, etc.).
-- **Self-hosted Next** (`next start`, Docker): **`VERCEL_URL`** is absent—set **`RESEARCH_AGENT_URL`** to your agent’s public **`POST /`** URL.
+- **Clerk + internal agent:** `/api/research` forwards the browser **`Cookie`** (and **`Authorization`** if present) to **`/api/research-agent`** so Clerk middleware accepts the second hop. The agent URL uses the **incoming request origin** (works for preview URLs and custom domains).
+- **Deployment Protection** on previews: add **`VERCEL_AUTOMATION_BYPASS_SECRET`** to the project (same value as in Vercel → Deployment Protection → Protection Bypass) so server-side `fetch` can send **`x-vercel-protection-bypass`**. Without it, protected previews may still block the internal request.
+- **Self-hosted Next** (`next start`, Docker): set **`RESEARCH_AGENT_URL`** to your agent’s public **`POST /`** URL (no same-origin Python).
 - Configure **Clerk** production and **Turso** (or hosted libSQL) as needed.
 - Long research runs depend on platform **timeouts** (`maxDuration` is configured for the research route and the Python function where supported).
 
