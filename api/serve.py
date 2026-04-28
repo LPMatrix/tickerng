@@ -10,7 +10,7 @@ from pathlib import Path
 
 def _load_handler():
     root = Path(__file__).resolve().parent
-    spec_path = root / "research_agent.py"
+    spec_path = root / "research-agent.py"
     spec = importlib.util.spec_from_file_location("vercel_research_agent", spec_path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Cannot load {spec_path}")

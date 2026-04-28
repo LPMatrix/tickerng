@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { observe } from "@langfuse/tracing";
 import { auth } from "@clerk/nextjs/server";
-import type { ResearchMode } from "@/lib/prompts";
 import { checkVerificationQuota } from "@/lib/billing";
 import { resolveResearchAgentEndpoint } from "@/lib/research-agent-url";
+
+type ResearchMode = "discovery" | "verification";
 
 /** Avoid default platform/route timeouts cutting off long streamed reports (OpenRouter SSE). */
 export const maxDuration = 300;

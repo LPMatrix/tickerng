@@ -166,10 +166,9 @@ Full list and optional flags (Langfuse, Paystack, prompt cache): **`.env.example
 src/
   app/             # Routes, layouts, API route handlers (`/api/research`, …)
   components/      # Report UI, history, export, …
-  lib/             # Prompts, Tavily helpers, billing, research-agent URL resolution
+  lib/             # Billing, Paystack, research-agent URL; research prompts live in `api/agent/`
 api/
-  research-agent.py  # Agent implementation + Vercel `handler` (POST streaming report)
-  research_agent.py  # Loader shim → research-agent.py (used by serve.py)
+  research-agent.py  # Vercel entry + shim: `handler` → `agent/` package; `serve.py` loads this file too
   serve.py           # Local dev HTTP server (port 8788)
 scripts/
   dev-research-agent.mjs   # Loads .env.local, runs Python serve.py
