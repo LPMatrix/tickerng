@@ -24,9 +24,45 @@ import { extractDiscoveryCandidateTickers } from "@/lib/discovery-enrichment";
 import { langfuseSpanProcessor } from "@/instrumentation";
 import { checkVerificationQuota } from "@/lib/billing";
 
+const OPENROUTER_PROMPT_CACHE_ENABLED =
+  process.env.OPENROUTER_PROMPT_CACHE_ENABLED?.trim().toLowerCase() !== "false";
+const OPENROUTER_PROMPT_CACHE_TTL =
+  process.env.OPENROUTER_PROMPT_CACHE_TTL?.trim().toLowerCase() === "1h" ? "1h" : "5m";
+
+function withOpenRouterPromptCache(init?: RequestInit): RequestInit | undefined {
+  if (!OPENROUTER_PROMPT_CACHE_ENABLED || !init?.body || typeof init.body !== "string") {
+    return init;
+  }
+
+  try {
+    const payload = JSON.parse(init.body) as Record<string, unknown>;
+    const model = typeof payload.model === "string" ? payload.model : "";
+    if (!model.startsWith("anthropic/")) {
+      return init;
+    }
+
+    // Anthropic prompt caching on OpenRouter: set top-level cache_control.
+    // We only set it when absent so call sites can still override in future.
+    if (!payload.cache_control) {
+      payload.cache_control =
+        OPENROUTER_PROMPT_CACHE_TTL === "1h"
+          ? { type: "ephemeral", ttl: "1h" }
+          : { type: "ephemeral" };
+    }
+
+    return {
+      ...init,
+      body: JSON.stringify(payload),
+    };
+  } catch {
+    return init;
+  }
+}
+
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
+  fetch: async (input, init) => fetch(input, withOpenRouterPromptCache(init)),
 });
 const OPENROUTER_MODEL_ID =
   process.env.OPENROUTER_MODEL?.trim() || "anthropic/claude-sonnet-4.6";
