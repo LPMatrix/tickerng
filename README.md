@@ -57,7 +57,7 @@ Browser (Next.js 15 / React 19)
 
 - **Next.js** handles UI, auth gates, quotas (e.g. verification limits), and proxies research to the agent.
 - **`npm run dev`** starts **both** Next.js and the Python agent (`scripts/dev-research-agent.mjs` loads `.env.local` for the Python process).
-- **Production (Vercel):** `api/research-agent.py` deploys as a Python Serverless Function. **`RESEARCH_AGENT_URL`** is optional—only if the agent runs on another host (see [Production notes](#production-notes)).
+- **Production (Vercel):** the repo uses **[Vercel Services](https://vercel.com/docs/services)** (`experimentalServices` in `vercel.json`): Next.js at `/` and the Python agent at **`/api/research-agent`**. Without Services, App Router can answer **`/api/research-agent` with 404** because Next owns `/api/*`. **`RESEARCH_AGENT_URL`** is optional—point it at an external agent only if you host Python elsewhere (see [Production notes](#production-notes)).
 
 ---
 
@@ -136,7 +136,7 @@ Browser (Next.js 15 / React 19)
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, Clerk URLs | Yes | Authentication |
 | `OPENROUTER_API_KEY` | Yes | LLM calls (via OpenRouter) |
 | `TAVILY_API_KEY` | Yes | Web search in the research pipeline |
-| `RESEARCH_AGENT_URL` | No | External agent origin (`POST /`). Omit locally (defaults to `serve.py`). On **Vercel**, omit unless the agent is hosted elsewhere—routing uses `/api/research-agent` automatically. |
+| `RESEARCH_AGENT_URL` | No | External agent origin (`POST /`). Omit locally (defaults to `serve.py`). On **Vercel**, omit if **[Services](https://vercel.com/docs/services)** deploy the Python handler at **`/api/research-agent`** (see `vercel.json`). Set this if the agent runs on another host (Railway, Fly, etc.). |
 | `RESEARCH_AGENT_PORT` | No | Dev agent port when using `serve.py` (default `8788`) |
 | `DATABASE_PATH` / Turso vars | No | Override DB path or use Turso |
 
@@ -175,7 +175,7 @@ api/
 scripts/
   dev-research-agent.mjs   # Loads .env.local, runs Python serve.py
   db-push-remote.mjs       # Loads .env.local, runs drizzle-kit push against Turso
-vercel.json           # Minimal schema (framework defaults); see Production notes for timeouts
+vercel.json           # `experimentalServices`: Next (`/`) + Python agent (`/api/research-agent`)
 .vercelignore         # Excludes local-only `api/serve.py` from uploads
 requirements.txt      # Pip hint (`langfuse`); lockfile is canonical (`uv lock`)
 pyproject.toml        # PEP 621 `[project]` — required for Vercel’s `uv lock` step
@@ -197,7 +197,8 @@ npm test
 
 ## Production notes
 
-- **Vercel:** Set **`OPENROUTER_API_KEY`** and **`TAVILY_API_KEY`** on the project—they apply to **both** Node and the Python function. **`api/research-agent.py`** runs at **`/api/research-agent`**; **`RESEARCH_AGENT_URL`** is **not** required unless the agent is deployed separately (Railway, Fly, etc.).
+- **Vercel Services:** `vercel.json` defines **`experimentalServices`** so the Python entry **`api/research-agent.py`** is built and routed at **`/api/research-agent`** alongside the Next app. That avoids **404** on `GET/POST /api/research-agent`, which happens if only the Next.js preset runs (App Router does not serve root-level `api/*.py` the old way). Redeploy after changing `vercel.json`. Local hybrid: **`vercel dev -L`** runs all services; **`npm run dev`** still uses `serve.py` on **8788**.
+- **Vercel env:** Set **`OPENROUTER_API_KEY`** and **`TAVILY_API_KEY`** on the project—they apply to **both** Node and the Python function. **`RESEARCH_AGENT_URL`** is **not** required when the Services backend is used; set it only if the agent is deployed separately (Railway, Fly, etc.).
 - **Clerk + internal agent:** `/api/research` forwards the browser **`Cookie`** (and **`Authorization`** if present) to **`/api/research-agent`** so Clerk middleware accepts the second hop. The agent URL uses the **incoming request origin** (works for preview URLs and custom domains).
 - **Deployment Protection** on previews: add **`VERCEL_AUTOMATION_BYPASS_SECRET`** to the project (same value as in Vercel → Deployment Protection → Protection Bypass) so server-side `fetch` can send **`x-vercel-protection-bypass`**. Without it, protected previews may still block the internal request.
 - **Self-hosted Next** (`next start`, Docker): set **`RESEARCH_AGENT_URL`** to your agent’s public **`POST /`** URL (no same-origin Python).
