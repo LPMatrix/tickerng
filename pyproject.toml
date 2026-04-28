@@ -1,0 +1,7 @@
+# Minimal PEP 621 project so Vercel's Python build (`uv lock`) succeeds.
+# The agent (`api/research-agent.py`) uses the standard library only; deps stay empty.
+[project]
+name = "tickerng-research-agent"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
