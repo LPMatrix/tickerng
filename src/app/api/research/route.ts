@@ -3,7 +3,7 @@ import { observe } from "@langfuse/tracing";
 import { auth } from "@clerk/nextjs/server";
 import type { ResearchMode } from "@/lib/prompts";
 import { checkVerificationQuota } from "@/lib/billing";
-import { resolveResearchAgentBase } from "@/lib/research-agent-url";
+import { resolveResearchAgentEndpoint } from "@/lib/research-agent-url";
 
 /** Avoid default platform/route timeouts cutting off long streamed reports (OpenRouter SSE). */
 export const maxDuration = 300;
@@ -57,10 +57,10 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
       }
     }
 
-    const agentBase = resolveResearchAgentBase();
-    if (!agentBase) {
+    const agentUrl = resolveResearchAgentEndpoint();
+    if (!agentUrl) {
       console.error(
-        "[research] RESEARCH_AGENT_URL is not set. In production, point it at your Python agent HTTP endpoint."
+        "[research] Research agent URL could not be resolved. On Vercel, VERCEL_URL should be set; otherwise set RESEARCH_AGENT_URL or run the local Python agent (npm run dev)."
       );
       return NextResponse.json(
         {
@@ -72,7 +72,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
 
     let upstream: Response;
     try {
-      upstream = await fetch(`${agentBase}/`, {
+      upstream = await fetch(agentUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode, query, includeMacroContext }),

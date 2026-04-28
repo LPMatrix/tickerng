@@ -10,6 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",
+    "db:push:remote": "node scripts/db-push-remote.mjs",
+    "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
     "test:watch": "vitest"

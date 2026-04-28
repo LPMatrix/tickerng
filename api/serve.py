@@ -21,8 +21,10 @@ def _load_handler():
 
 def main() -> None:
     Handler = _load_handler()
+    # Host: use 0.0.0.0 when exposing publicly (Railway/Render/Fly). Local dev defaults to loopback.
     host = os.environ.get("RESEARCH_AGENT_HOST", "127.0.0.1")
-    port = int(os.environ.get("RESEARCH_AGENT_PORT", "8788"))
+    # PORT is set by many hosts; RESEARCH_AGENT_PORT matches local npm dev default.
+    port = int(os.environ.get("PORT") or os.environ.get("RESEARCH_AGENT_PORT", "8788"))
     httpd = HTTPServer((host, port), Handler)
     print(f"[research-agent] POST http://{host}:{port}/", flush=True)
     httpd.serve_forever()
