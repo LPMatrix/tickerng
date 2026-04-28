@@ -5,12 +5,9 @@ import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List
 
-from agent.constants import (
-    GLOBAL_TICKER_NOISE_DOMAINS,
-    MAX_DISCOVERY_ENRICHMENT_TICKERS,
-    TICKER_EXTRACT_SYSTEM,
-)
+from agent.constants import GLOBAL_TICKER_NOISE_DOMAINS, MAX_DISCOVERY_ENRICHMENT_TICKERS
 from agent.openrouter import openrouter_generate
+from agent.prompt_resolve import ticker_extract_system
 from agent.prompts import get_system_prompt_discovery, get_user_message
 from agent.specialists import fundamentals_tavily_markdown
 from agent.tavily import tavily_search_to_markdown
@@ -78,7 +75,7 @@ def run_discovery(query: str, include_macro_context: bool, tavily_api_key: str) 
 
     try:
         extraction_user = f"User query:\n{query.strip()}\n\nWeb excerpts (may be partial):\n{initial_md[:120000]}"
-        extract_text = openrouter_generate(TICKER_EXTRACT_SYSTEM, extraction_user, max_tokens=256, temperature=0)
+        extract_text = openrouter_generate(ticker_extract_system(), extraction_user, max_tokens=256, temperature=0)
         candidate_tickers = parse_tickers_from_extraction_json(extract_text)
         if candidate_tickers:
             per_ticker_blocks: List[str] = []

@@ -1,1 +1,2 @@
-# Vercel Python serverless (`api/research-agent.py`). Stdlib-only; listed so Vercel enables the Python runtime.
+# Mirrors pyproject research-agent deps for environments that use pip instead of uv.
+langfuse>=4.5.1

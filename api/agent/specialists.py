@@ -2,12 +2,8 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
-from agent.constants import (
-    GLOBAL_TICKER_NOISE_DOMAINS,
-    NGX_EXCHANGE_DOMAINS,
-    NGX_PRIORITY_DOMAINS,
-    SPECIALIST_CORE,
-)
+from agent.constants import GLOBAL_TICKER_NOISE_DOMAINS, NGX_EXCHANGE_DOMAINS, NGX_PRIORITY_DOMAINS
+from agent.prompt_resolve import specialist_core
 from agent.queries import (
     filings_exchange_query,
     macro_query,
@@ -188,26 +184,27 @@ def build_specialist_web_context(api_key: str, ticker: str, key: str) -> str:
 
 
 def get_specialist_system_prompt(key: str) -> str:
+    core = specialist_core()
     if key == "fundamentals":
-        return f"""{SPECIALIST_CORE}
+        return f"""{core}
 
 Your scope ONLY: company fundamentals and valuation for the given ticker.
 Cover: snapshot (sector/mcap/volume), financial summary, valuation.
 Do NOT cover macro/news/sentiment in depth.
 """
     if key == "news":
-        return f"""{SPECIALIST_CORE}
+        return f"""{core}
 
 Your scope ONLY: material news and corporate actions for the given ticker.
 Cover notable news, corporate actions, upcoming dates.
 """
     if key == "macro":
-        return f"""{SPECIALIST_CORE}
+        return f"""{core}
 
 Your scope ONLY: macro and market context relevant to this ticker/sector.
 Cover CBN rate, inflation, FX context, NGX All-Share trend, and one qualitative impact paragraph.
 """
-    return f"""{SPECIALIST_CORE}
+    return f"""{core}
 
 Your scope ONLY: analyst and market sentiment for the given ticker.
 Cover ratings/consensus if found, and reliable social sentiment if available.

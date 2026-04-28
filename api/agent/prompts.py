@@ -2,7 +2,7 @@
 
 import re
 
-from agent.constants import CORE_RULES
+from agent.prompt_resolve import core_rules
 
 
 def normalize_ticker(raw: str) -> str:
@@ -15,7 +15,7 @@ def sanitize_query(raw: str) -> str:
 
 def get_system_prompt_discovery(include_macro: bool) -> str:
     macro_instruction = "Include macro context as section 1." if include_macro else "Do not include a separate Macro Context section."
-    return f"""{CORE_RULES}
+    return f"""{core_rules()}
 
 You are in DISCOVERY mode. Use only provided web excerpts for claims. {macro_instruction}
 

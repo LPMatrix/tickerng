@@ -3,7 +3,8 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict
 
-from agent.constants import SPECIALIST_KEYS, SYNTHESIS_SYSTEM
+from agent.constants import SPECIALIST_KEYS
+from agent.prompt_resolve import synthesis_system
 from agent.openrouter import openrouter_generate
 from agent.prompts import get_synthesis_user_message, normalize_ticker
 from agent.specialists import (
@@ -38,4 +39,4 @@ def run_verification(query: str, tavily_api_key: str) -> Dict[str, str]:
             memos[future_map[f]] = f.result()
 
     synthesis_user = get_synthesis_user_message(ticker, memos)
-    return {"system": SYNTHESIS_SYSTEM, "user": synthesis_user}
+    return {"system": synthesis_system(), "user": synthesis_user}
