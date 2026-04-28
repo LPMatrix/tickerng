@@ -107,7 +107,9 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
     }
 
     if (upstream.status === 404) {
-      console.error("[research] Agent returned 404 — check RESEARCH_AGENT_URL and the agent process.");
+      console.error(
+        `[research] Agent returned 404 (url=${agentUrl}) — start serve.py on that host/port, or set RESEARCH_AGENT_URL.`
+      );
       return NextResponse.json(
         {
           error: "Research is temporarily unavailable. Please try again in a few minutes.",

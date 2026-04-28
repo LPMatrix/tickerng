@@ -125,7 +125,7 @@ Browser (Next.js 15 / React 19)
 
 5. **Sign in** via Clerk, open the research experience, and try **Verification** with a ticker or **Discovery** with a theme.
 
-> **Troubleshooting:** If research returns “temporarily unavailable,” check the terminal labeled **agent** for Python errors, confirm `OPENROUTER_API_KEY` and `TAVILY_API_KEY`, and ensure nothing else is bound to port **8788**.
+> **Troubleshooting:** If research returns “temporarily unavailable,” check the terminal labeled **agent** for Python errors, confirm `OPENROUTER_API_KEY` and `TAVILY_API_KEY`, and ensure nothing else is bound to port **8788**. Local **`next start`** still POSTs to **`127.0.0.1:8788`** (not `/api/research-agent` on port 3000) unless **`VERCEL`** is set in production on Vercel’s hosts.
 
 ---
 
