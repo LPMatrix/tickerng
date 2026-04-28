@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  FileText, 
-  Search, 
-  RefreshCw, 
-  Clock, 
+import {
+  FileText,
+  Search,
+  RefreshCw,
+  Clock,
   ChevronRight,
   History,
   Download,
   Copy,
   Check,
   Trash2,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -39,6 +41,8 @@ export function ReportHistory({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ReportSummary | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,6 +61,21 @@ export function ReportHistory({
       cancelled = true;
     };
   }, [reportsVersion]);
+
+  useEffect(() => {
+    if (!pendingDelete) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !deletingId) setPendingDelete(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pendingDelete, deletingId]);
+
+  useEffect(() => {
+    if (!deleteError) return;
+    const t = window.setTimeout(() => setDeleteError(null), 6000);
+    return () => window.clearTimeout(t);
+  }, [deleteError]);
 
   const refresh = () => {
     setLoading(true);
@@ -177,16 +196,16 @@ export function ReportHistory({
     }
   };
 
-  const handleDelete = async (report: ReportSummary, e: React.MouseEvent) => {
+  const openDeleteConfirm = (report: ReportSummary, e: React.MouseEvent) => {
     e.stopPropagation();
     if (deletingId === report.id) return;
-    if (
-      !window.confirm(
-        "Delete this report? Shared links will stop working. This cannot be undone."
-      )
-    ) {
-      return;
-    }
+    setDeleteError(null);
+    setPendingDelete(report);
+  };
+
+  const handleConfirmDelete = async () => {
+    const report = pendingDelete;
+    if (!report || deletingId) return;
     setDeletingId(report.id);
     try {
       const res = await fetch(`/api/reports/${report.id}`, { method: "DELETE" });
@@ -195,9 +214,11 @@ export function ReportHistory({
       }
       setList((prev) => prev.filter((r) => r.id !== report.id));
       onReportDeleted?.(report.id);
+      setPendingDelete(null);
     } catch (err) {
       console.error("Failed to delete report:", err);
-      alert("Could not delete the report. Try again.");
+      setDeleteError("Could not delete the report. Try again.");
+      setPendingDelete(null);
     } finally {
       setDeletingId(null);
     }
@@ -224,6 +245,24 @@ export function ReportHistory({
 
   return (
     <div className="space-y-4">
+      {deleteError && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2.5 text-sm text-red-800 dark:text-red-200"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden />
+          <span className="flex-1">{deleteError}</span>
+          <button
+            type="button"
+            onClick={() => setDeleteError(null)}
+            className="rounded p-0.5 text-red-700 hover:bg-red-500/15 dark:text-red-300"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -385,7 +424,7 @@ export function ReportHistory({
 
                     <button
                       type="button"
-                      onClick={(e) => handleDelete(report, e)}
+                      onClick={(e) => openDeleteConfirm(report, e)}
                       disabled={deletingId === report.id}
                       className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-[var(--color-mute)] transition-colors hover:bg-red-500/10 hover:text-red-600 disabled:opacity-50"
                       title="Delete report"
@@ -410,6 +449,69 @@ export function ReportHistory({
         <p className="pt-4 text-center text-xs text-[var(--color-mute-light)]">
           Reports are saved automatically
         </p>
+      )}
+
+      {pendingDelete && (
+        <div className="fixed inset-0 z-[80] flex items-end justify-center p-4 sm:items-center">
+          <button
+            type="button"
+            className="absolute inset-0 bg-[var(--color-ink)]/40 backdrop-blur-[2px]"
+            aria-hidden
+            disabled={!!deletingId}
+            onClick={() => !deletingId && setPendingDelete(null)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-report-title"
+            className="relative z-[81] w-full max-w-md rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 shadow-xl animate-fade-in"
+          >
+            <div className="flex gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600">
+                <Trash2 className="h-5 w-5" aria-hidden />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3
+                  id="delete-report-title"
+                  className="font-display text-base font-semibold text-[var(--color-ink)]"
+                >
+                  Delete this report?
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--color-mute)]">
+                  Shared links will stop working. This cannot be undone.
+                </p>
+                <p className="mt-3 truncate rounded-lg bg-[var(--color-bg)] px-3 py-2 text-xs font-medium text-[var(--color-ink)]">
+                  {pendingDelete.query}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                disabled={!!deletingId}
+                onClick={() => setPendingDelete(null)}
+                className="inline-flex justify-center rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-4 py-2.5 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-accent)]/5 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!!deletingId}
+                onClick={handleConfirmDelete}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+              >
+                {deletingId === pendingDelete.id ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Deleting…
+                  </>
+                ) : (
+                  "Delete report"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

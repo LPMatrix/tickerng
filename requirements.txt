@@ -1,0 +1,1 @@
+# Vercel Python serverless (`api/research-agent.py`). Stdlib-only; listed so Vercel enables the Python runtime.
