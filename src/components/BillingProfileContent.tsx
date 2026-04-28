@@ -80,7 +80,7 @@ export function BillingProfileContent() {
         {cancelConfirm ? (
           <div className="space-y-3 rounded-lg border border-gray-200 p-4">
             <p className="text-sm text-gray-700">
-              Cancel your Pro subscription? You&apos;ll keep access until the end of the current billing period.
+              Cancel your Pro subscription? You will keep access until the end of the current billing period.
             </p>
             <div className="flex gap-2">
               <button
