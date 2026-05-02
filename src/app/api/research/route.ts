@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { observe, updateActiveObservation } from "@langfuse/tracing";
 import { auth } from "@clerk/nextjs/server";
 import { checkVerificationQuota } from "@/lib/billing";
+import { resolveListedNgxTicker } from "@/lib/ngx-ticker-lookup";
 import { resolveResearchAgentEndpoint } from "@/lib/research-agent-url";
 
 type ResearchMode = "discovery" | "verification";
@@ -47,6 +48,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
     const mode = (body.mode === "discovery" ? "discovery" : "verification") as ResearchMode;
     const query = typeof body.query === "string" ? body.query.trim() : "";
     const includeMacroContext = mode === "discovery" && body.includeMacroContext !== false;
+    let ngxListedMeta: { symbol: string; companyName: string } | null = null;
 
     if (!query) {
       lfOutput({ httpStatus: 400, error: "missing_query" });
@@ -58,6 +60,16 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
       if (!ticker) {
         lfOutput({ httpStatus: 400, error: "invalid_ticker" });
         return NextResponse.json({ error: "Missing or invalid ticker" }, { status: 400 });
+      }
+      ngxListedMeta = resolveListedNgxTicker(ticker);
+      if (!ngxListedMeta) {
+        lfOutput({ httpStatus: 400, error: "unknown_ngx_ticker", ticker });
+        return NextResponse.json(
+          {
+            error: `${ticker} is not a recognized NGX-listed ticker. Use the official symbol (e.g. ACCESSCORP, GTCO) and try again.`,
+          },
+          { status: 400 }
+        );
       }
       const quota = await checkVerificationQuota(userId);
       if (!quota.allowed) {
@@ -78,6 +90,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
         mode,
         query: mode === "verification" ? normalizeTicker(query) : query,
         includeMacroContext,
+        ...(ngxListedMeta && { ngxCompanyName: ngxListedMeta.companyName }),
       },
       metadata: { userId },
     });
