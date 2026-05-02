@@ -1,0 +1,599 @@
+{
+  "generatedAt": "2026-05-02T12:46:43.944Z",
+  "source": "https://afx.kwayisi.org/ngx/",
+  "count": 148,
+  "equities": [
+    {
+      "symbol": "ABBEYBDS",
+      "companyName": "Abbey Mortgage Bank Plc"
+    },
+    {
+      "symbol": "ABCTRANS",
+      "companyName": "Associated Bus Company"
+    },
+    {
+      "symbol": "ACADEMY",
+      "companyName": "Academy Press"
+    },
+    {
+      "symbol": "ACCESSCORP",
+      "companyName": "Access Holdings Plc"
+    },
+    {
+      "symbol": "AFRINSURE",
+      "companyName": "African Alliance Insurance"
+    },
+    {
+      "symbol": "AFRIPRUD",
+      "companyName": "Africa Prudential Plc"
+    },
+    {
+      "symbol": "AFROMEDIA",
+      "companyName": "Afromedia Plc"
+    },
+    {
+      "symbol": "AIICO",
+      "companyName": "Aiico Insurance Plc"
+    },
+    {
+      "symbol": "AIRTELAFRI",
+      "companyName": "Airtel Africa Plc"
+    },
+    {
+      "symbol": "ALEX",
+      "companyName": "Aluminium Extrusion Industries"
+    },
+    {
+      "symbol": "ARADEL",
+      "companyName": "Aradel Holdings"
+    },
+    {
+      "symbol": "AUSTINLAZ",
+      "companyName": "Austin Laz & Company"
+    },
+    {
+      "symbol": "AVAIF",
+      "companyName": "Ava Infrastructure Fund"
+    },
+    {
+      "symbol": "BAPLC",
+      "companyName": "Briclinks Africa Plc"
+    },
+    {
+      "symbol": "BERGER",
+      "companyName": "Berger Paints"
+    },
+    {
+      "symbol": "BETAGLAS",
+      "companyName": "Beta Glass Company"
+    },
+    {
+      "symbol": "BUACEMENT",
+      "companyName": "BUA Cement Plc"
+    },
+    {
+      "symbol": "BUAFOODS",
+      "companyName": "BUA Foods"
+    },
+    {
+      "symbol": "CADBURY",
+      "companyName": "Cadbury Nigeria"
+    },
+    {
+      "symbol": "CAP",
+      "companyName": "CAP Plc"
+    },
+    {
+      "symbol": "CAVERTON",
+      "companyName": "Caverton Offshore Support Group"
+    },
+    {
+      "symbol": "CHAMPION",
+      "companyName": "Champion Breweries"
+    },
+    {
+      "symbol": "CHAMS",
+      "companyName": "Chams Plc"
+    },
+    {
+      "symbol": "CHELLARAM",
+      "companyName": "Chellarams Plc"
+    },
+    {
+      "symbol": "CILEASING",
+      "companyName": "C&I Leasing Plc"
+    },
+    {
+      "symbol": "CNIF",
+      "companyName": "Coronation Infrastructure Fund"
+    },
+    {
+      "symbol": "CONHALLPLC",
+      "companyName": "Consolidated Hallmark Holdings"
+    },
+    {
+      "symbol": "CONOIL",
+      "companyName": "Conoil Plc"
+    },
+    {
+      "symbol": "CORNERST",
+      "companyName": "Cornerstone Insurance Company"
+    },
+    {
+      "symbol": "CUSTODIAN",
+      "companyName": "Custodian & Allied Plc"
+    },
+    {
+      "symbol": "CUTIX",
+      "companyName": "Cutix Plc"
+    },
+    {
+      "symbol": "CWG",
+      "companyName": "Computer Warehouse Group"
+    },
+    {
+      "symbol": "DAARCOMM",
+      "companyName": "Daar Communications"
+    },
+    {
+      "symbol": "DANGCEM",
+      "companyName": "Dangote Cement"
+    },
+    {
+      "symbol": "DANGSUGAR",
+      "companyName": "Dangote Sugar Refinery"
+    },
+    {
+      "symbol": "DEAPCAP",
+      "companyName": "Deap Capital Management & Trust"
+    },
+    {
+      "symbol": "DUNLOP",
+      "companyName": "DN Tyre & Rubber Plc"
+    },
+    {
+      "symbol": "EKOCORP",
+      "companyName": "Ekocorp Plc"
+    },
+    {
+      "symbol": "ELLAHLAKES",
+      "companyName": "Ellah Lakes Plc"
+    },
+    {
+      "symbol": "ENAMELWA",
+      "companyName": "Nigerian Enamelware Plc"
+    },
+    {
+      "symbol": "ETERNA",
+      "companyName": "Eterna Plc"
+    },
+    {
+      "symbol": "ETI",
+      "companyName": "Ecobank Transnational Inc"
+    },
+    {
+      "symbol": "ETRANZACT",
+      "companyName": "E-Tranzact International"
+    },
+    {
+      "symbol": "EUNISELL",
+      "companyName": "Eunisell Interlinked Plc"
+    },
+    {
+      "symbol": "FCMB",
+      "companyName": "FCMB Group Plc"
+    },
+    {
+      "symbol": "FIDELITYBK",
+      "companyName": "Fidelity Bank Plc"
+    },
+    {
+      "symbol": "FIDSON",
+      "companyName": "Fidson Healthcare"
+    },
+    {
+      "symbol": "FIRSTHOLDCO",
+      "companyName": "First HoldCo Plc"
+    },
+    {
+      "symbol": "FTGINSURE",
+      "companyName": "Fortis Global Insurance"
+    },
+    {
+      "symbol": "FTNCOCOA",
+      "companyName": "FTN Cocoa Processors"
+    },
+    {
+      "symbol": "GEREGU",
+      "companyName": "Geregu Power Plc"
+    },
+    {
+      "symbol": "GOLDBREW",
+      "companyName": "Golden Guinea Breweries"
+    },
+    {
+      "symbol": "GTCO",
+      "companyName": "Guaranty Trust Holding"
+    },
+    {
+      "symbol": "GUINEAINS",
+      "companyName": "Guinea Insurance"
+    },
+    {
+      "symbol": "GUINNESS",
+      "companyName": "Guinness Nigeria"
+    },
+    {
+      "symbol": "HMCALL",
+      "companyName": "Haldane McCall"
+    },
+    {
+      "symbol": "HONYFLOUR",
+      "companyName": "Honeywell Flour Mill"
+    },
+    {
+      "symbol": "IKEJAHOTEL",
+      "companyName": "Ikeja Hotel Plc"
+    },
+    {
+      "symbol": "IMG",
+      "companyName": "Industrial & Medical Gases"
+    },
+    {
+      "symbol": "INFINITY",
+      "companyName": "Infinity Trust Mortgage Bank"
+    },
+    {
+      "symbol": "INTBREW",
+      "companyName": "International Breweries"
+    },
+    {
+      "symbol": "INTENEGINS",
+      "companyName": "International Energy Insurance"
+    },
+    {
+      "symbol": "JAIZBANK",
+      "companyName": "Jaiz Bank Plc"
+    },
+    {
+      "symbol": "JAPAULGOLD",
+      "companyName": "Japaul Gold and Ventures Plc"
+    },
+    {
+      "symbol": "JBERGER",
+      "companyName": "Julius Berger Nigeria Plc"
+    },
+    {
+      "symbol": "JOHNHOLT",
+      "companyName": "John Holt Plc"
+    },
+    {
+      "symbol": "JULI",
+      "companyName": "Juli Plc"
+    },
+    {
+      "symbol": "LASACO",
+      "companyName": "Lasaco Assurance"
+    },
+    {
+      "symbol": "LEARNAFRCA",
+      "companyName": "Learn Africa"
+    },
+    {
+      "symbol": "LEGENDINT",
+      "companyName": "Legend Internet"
+    },
+    {
+      "symbol": "LINKASSURE",
+      "companyName": "Linkage Assurance"
+    },
+    {
+      "symbol": "LIVESTOCK",
+      "companyName": "Livestock Feeds"
+    },
+    {
+      "symbol": "LIVINGTRUST",
+      "companyName": "LivingTrust Mortgage Bank"
+    },
+    {
+      "symbol": "MANSARD",
+      "companyName": "AXA Mansard Insurance"
+    },
+    {
+      "symbol": "MAYBAKER",
+      "companyName": "May & Baker Nigeria"
+    },
+    {
+      "symbol": "MBENEFIT",
+      "companyName": "Mutual Benefits Assurance"
+    },
+    {
+      "symbol": "MCNICHOLS",
+      "companyName": "McNichols Plc"
+    },
+    {
+      "symbol": "MECURE",
+      "companyName": "MeCure Industries"
+    },
+    {
+      "symbol": "MEYER",
+      "companyName": "Meyer Plc"
+    },
+    {
+      "symbol": "MOFIREIF",
+      "companyName": "MOFI Real Estate Investment Fund"
+    },
+    {
+      "symbol": "MORISON",
+      "companyName": "Morison Industries"
+    },
+    {
+      "symbol": "MTNN",
+      "companyName": "MTN Nigeria"
+    },
+    {
+      "symbol": "MULTITREX",
+      "companyName": "Multi-Trex Integrated Foods"
+    },
+    {
+      "symbol": "MULTIVERSE",
+      "companyName": "Multiverse Mining & Exploration"
+    },
+    {
+      "symbol": "NAHCO",
+      "companyName": "Nigerian Aviation Handling Co."
+    },
+    {
+      "symbol": "NASCON",
+      "companyName": "National Salt Company"
+    },
+    {
+      "symbol": "NB",
+      "companyName": "Nigerian Breweries"
+    },
+    {
+      "symbol": "NCR",
+      "companyName": "NCR Nigeria"
+    },
+    {
+      "symbol": "NEIMETH",
+      "companyName": "Neimeth International Pharma"
+    },
+    {
+      "symbol": "NEM",
+      "companyName": "N.E.M. Insurance Company"
+    },
+    {
+      "symbol": "NESTLE",
+      "companyName": "Nestle Nigeria"
+    },
+    {
+      "symbol": "NGXGROUP",
+      "companyName": "Nigerian Exchange Group"
+    },
+    {
+      "symbol": "NIDF",
+      "companyName": "Nigeria Infrastructure Debt Fund"
+    },
+    {
+      "symbol": "NNFM",
+      "companyName": "Northern Nigeria Flour Mills"
+    },
+    {
+      "symbol": "NPFMCRFBK",
+      "companyName": "NPF Microfinance Bank"
+    },
+    {
+      "symbol": "NREIT",
+      "companyName": "Nigeria REIT"
+    },
+    {
+      "symbol": "NSLTECH",
+      "companyName": "Secure Electronic Technology"
+    },
+    {
+      "symbol": "OANDO",
+      "companyName": "Oando Plc"
+    },
+    {
+      "symbol": "OKOMUOIL",
+      "companyName": "Okomu Oil Palm"
+    },
+    {
+      "symbol": "OMATEK",
+      "companyName": "Omatek Ventures"
+    },
+    {
+      "symbol": "PHARMDEKO",
+      "companyName": "Pharma-Deko Plc"
+    },
+    {
+      "symbol": "PREMPAINTS",
+      "companyName": "Premier Paints"
+    },
+    {
+      "symbol": "PRESCO",
+      "companyName": "Presco Plc"
+    },
+    {
+      "symbol": "PRESTIGE",
+      "companyName": "Prestige Assurance Company"
+    },
+    {
+      "symbol": "PZ",
+      "companyName": "PZ Cussons Nigeria"
+    },
+    {
+      "symbol": "REDSTAREX",
+      "companyName": "Red Star Express Plc"
+    },
+    {
+      "symbol": "REGALINS",
+      "companyName": "Regency Alliance Insurance"
+    },
+    {
+      "symbol": "RONCHESS",
+      "companyName": "Ronchess Global Resources"
+    },
+    {
+      "symbol": "ROYALEX",
+      "companyName": "Royal Exchange"
+    },
+    {
+      "symbol": "RTBRISCOE",
+      "companyName": "RT Briscoe"
+    },
+    {
+      "symbol": "SCOA",
+      "companyName": "SCOA  Nigeria"
+    },
+    {
+      "symbol": "SEPLAT",
+      "companyName": "Seplat Petroleum Development Co."
+    },
+    {
+      "symbol": "SFSREIT",
+      "companyName": "Skye Shelter Fund Plc"
+    },
+    {
+      "symbol": "SKYAVN",
+      "companyName": "Skyway Aviation Handling Co. Plc"
+    },
+    {
+      "symbol": "SOVRENINS",
+      "companyName": "Sovereign Trust Insurance"
+    },
+    {
+      "symbol": "STACO",
+      "companyName": "Staco Insurance"
+    },
+    {
+      "symbol": "STANBIC",
+      "companyName": "Stanbic IBTC Holdings"
+    },
+    {
+      "symbol": "STERLINGNG",
+      "companyName": "Sterling Bank"
+    },
+    {
+      "symbol": "SUNUASSUR",
+      "companyName": "Sunu Assurances Nigeria Plc"
+    },
+    {
+      "symbol": "TANTALIZER",
+      "companyName": "Tantalizers Plc"
+    },
+    {
+      "symbol": "THOMASWY",
+      "companyName": "Thomas Wyatt Nigeria"
+    },
+    {
+      "symbol": "TIP",
+      "companyName": "The Initiates Plc"
+    },
+    {
+      "symbol": "TOTAL",
+      "companyName": "Total Nigeria"
+    },
+    {
+      "symbol": "TRANSCOHOT",
+      "companyName": "Transcorp Hotels Plc"
+    },
+    {
+      "symbol": "TRANSCORP",
+      "companyName": "Transcorp Nigeria"
+    },
+    {
+      "symbol": "TRANSEXPR",
+      "companyName": "Trans-Nationwide Express"
+    },
+    {
+      "symbol": "TRANSPOWER",
+      "companyName": "Transcorp Power"
+    },
+    {
+      "symbol": "TRIPPLEG",
+      "companyName": "Tripple Gee & Co. Plc"
+    },
+    {
+      "symbol": "UACN",
+      "companyName": "UAC of Nigeria"
+    },
+    {
+      "symbol": "UBA",
+      "companyName": "United Bank for Africa"
+    },
+    {
+      "symbol": "UCAP",
+      "companyName": "United Capital Plc"
+    },
+    {
+      "symbol": "UHOMREIT",
+      "companyName": "Union Homes Real Estate Inv."
+    },
+    {
+      "symbol": "UNILEVER",
+      "companyName": "Unilever Nigeria"
+    },
+    {
+      "symbol": "UNIONDICON",
+      "companyName": "Union Dicon Salt"
+    },
+    {
+      "symbol": "UNITYBNK",
+      "companyName": "Unity Bank"
+    },
+    {
+      "symbol": "UNIVINSURE",
+      "companyName": "Universal Insurance Company"
+    },
+    {
+      "symbol": "UPDC",
+      "companyName": "UPDC Plc"
+    },
+    {
+      "symbol": "UPDCREIT",
+      "companyName": "UPDC Real Estate Investment Trust"
+    },
+    {
+      "symbol": "UPL",
+      "companyName": "University Press"
+    },
+    {
+      "symbol": "VANLEER",
+      "companyName": "Greif Nigeria"
+    },
+    {
+      "symbol": "VERITASKAP",
+      "companyName": "Veritas Kapital Assurance Plc"
+    },
+    {
+      "symbol": "VFDGROUP",
+      "companyName": "VFD Group"
+    },
+    {
+      "symbol": "VITAFOAM",
+      "companyName": "Vitafoam Nigeria"
+    },
+    {
+      "symbol": "WAPCO",
+      "companyName": "Lafarge Africa"
+    },
+    {
+      "symbol": "WAPIC",
+      "companyName": "Coronation Insurance"
+    },
+    {
+      "symbol": "WEMABANK",
+      "companyName": "Wema Bank"
+    },
+    {
+      "symbol": "ZENITHBANK",
+      "companyName": "Zenith Bank Plc"
+    },
+    {
+      "symbol": "ZICHIS",
+      "companyName": "Zichis Agro Allied Industries"
+    }
+  ]
+}
