@@ -2,9 +2,10 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
-from agent.constants import GLOBAL_TICKER_NOISE_DOMAINS, NGX_EXCHANGE_DOMAINS, NGX_PRIORITY_DOMAINS
-from agent.prompt_resolve import specialist_core
-from agent.queries import (
+from agent.config.constants import GLOBAL_TICKER_NOISE_DOMAINS, NGX_EXCHANGE_DOMAINS, NGX_PRIORITY_DOMAINS
+from agent.prompts.prompt_resolve import specialist_core
+from agent.search.tavily import tavily_depth, tavily_search_to_markdown
+from agent.stages.queries import (
     filings_exchange_query,
     macro_query,
     market_data_query,
@@ -12,7 +13,6 @@ from agent.queries import (
     sentiment_deep_query,
     wide_query,
 )
-from agent.tavily import tavily_depth, tavily_search_to_markdown
 
 
 def fundamentals_tavily_markdown(api_key: str, ticker: str) -> str:

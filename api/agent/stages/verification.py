@@ -1,25 +1,45 @@
 """Verification mode: parallel specialists + synthesis prompt."""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict
+from typing import Dict, Optional
 
-from agent.constants import SPECIALIST_KEYS
-from agent.prompt_resolve import synthesis_system
-from agent.openrouter import openrouter_generate
-from agent.prompts import get_synthesis_user_message, normalize_ticker
-from agent.specialists import (
+from langfuse import observe
+
+from agent.config.constants import SPECIALIST_KEYS
+from agent.llm.openrouter import openrouter_generate
+from agent.observability.tracing import current_trace_context, threaded_generation, truncate_io
+from agent.prompts.prompt_resolve import synthesis_system
+from agent.prompts.prompts import get_synthesis_user_message, normalize_ticker
+from agent.stages.specialists import (
     build_specialist_web_context,
     get_specialist_system_prompt,
     get_specialist_user_message,
 )
 
 
-def run_specialist(tavily_api_key: str, key: str, ticker: str) -> str:
+def run_specialist(
+    tavily_api_key: str,
+    key: str,
+    ticker: str,
+    trace_context: Optional[Dict[str, str]] = None,
+) -> str:
     label = key.capitalize()
     try:
         search_md = build_specialist_web_context(tavily_api_key, ticker, key)
         user_content = f"{get_specialist_user_message(ticker, key)}\n\n{search_md}"
-        text = openrouter_generate(get_specialist_system_prompt(key), user_content, max_tokens=4096)
+        with threaded_generation(
+            name=f"specialist-{key}",
+            trace_context=trace_context,
+            metadata={"ticker": ticker, "specialist": key},
+            input_payload={"ticker": ticker, "specialist": key},
+        ) as obs:
+            text = openrouter_generate(get_specialist_system_prompt(key), user_content, max_tokens=4096)
+            if obs is not None:
+                obs.update(
+                    output=truncate_io(text)
+                    if text
+                    else "### empty specialist response"
+                )
         if not text:
             return f"### {label} specialist\n\nNo text returned from model.\n\n[Low] - empty specialist response"
         return text
@@ -27,14 +47,19 @@ def run_specialist(tavily_api_key: str, key: str, ticker: str) -> str:
         return f"### {label} specialist failed\n\n{e}\n\n[Low] - specialist API error"
 
 
+@observe(name="verification.pipeline", capture_input=False, capture_output=False)
 def run_verification(query: str, tavily_api_key: str) -> Dict[str, str]:
     ticker = normalize_ticker(query)
     if not ticker:
         raise ValueError("Missing or invalid ticker")
 
+    tc = current_trace_context()
+
     memos: Dict[str, str] = {}
     with ThreadPoolExecutor(max_workers=4) as ex:
-        future_map = {ex.submit(run_specialist, tavily_api_key, k, ticker): k for k in SPECIALIST_KEYS}
+        future_map = {
+            ex.submit(run_specialist, tavily_api_key, k, ticker, tc): k for k in SPECIALIST_KEYS
+        }
         for f in as_completed(future_map):
             memos[future_map[f]] = f.result()
 

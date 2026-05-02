@@ -6,7 +6,7 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, Optional
 
-from agent.constants import TAVILY_SEARCH_URL
+from agent.config.constants import TAVILY_SEARCH_URL
 
 
 def tavily_depth(phase: str) -> str:

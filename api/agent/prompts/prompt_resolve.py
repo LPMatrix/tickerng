@@ -18,7 +18,7 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from agent.prompt_fallbacks import (
+from agent.prompts.prompt_fallbacks import (
     CORE_RULES,
     SPECIALIST_CORE,
     SYNTHESIS_SYSTEM,

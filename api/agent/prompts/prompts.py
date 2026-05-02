@@ -2,7 +2,7 @@
 
 import re
 
-from agent.prompt_resolve import core_rules
+from agent.prompts.prompt_resolve import core_rules
 
 
 def normalize_ticker(raw: str) -> str:

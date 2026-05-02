@@ -3,14 +3,23 @@
 import json
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from agent.constants import GLOBAL_TICKER_NOISE_DOMAINS, MAX_DISCOVERY_ENRICHMENT_TICKERS
-from agent.openrouter import openrouter_generate
-from agent.prompt_resolve import ticker_extract_system
-from agent.prompts import get_system_prompt_discovery, get_user_message
-from agent.specialists import fundamentals_tavily_markdown
-from agent.tavily import tavily_search_to_markdown
+from langfuse import get_client, observe
+
+from agent.config.constants import GLOBAL_TICKER_NOISE_DOMAINS, MAX_DISCOVERY_ENRICHMENT_TICKERS
+from agent.llm.openrouter import openrouter_generate
+from agent.prompts.prompt_resolve import ticker_extract_system
+from agent.prompts.prompts import get_system_prompt_discovery, get_user_message
+from agent.search.tavily import tavily_search_to_markdown
+from agent.stages.specialists import fundamentals_tavily_markdown
+from agent.observability.tracing import (
+    agent_tracing_enabled,
+    current_trace_context,
+    default_openrouter_model,
+    threaded_span,
+    truncate_io,
+)
 
 
 def discovery_tavily_queries(user_query: str, include_macro: bool) -> List[str]:
@@ -49,6 +58,21 @@ def parse_tickers_from_extraction_json(text: str) -> List[str]:
     return out
 
 
+def _enrichment_block(api_key: str, ticker: str, trace_context: Optional[Dict[str, str]]) -> str:
+    """Single ticker's Tavily bundle (runs in thread pool)."""
+    with threaded_span(
+        name=f"discovery.enrichment-{ticker}",
+        trace_context=trace_context,
+        metadata={"ticker": ticker},
+        input_payload={"ticker": ticker},
+    ) as obs:
+        md = fundamentals_tavily_markdown(api_key, ticker)
+        if obs is not None:
+            obs.update(output=truncate_io(md))
+        return md
+
+
+@observe(name="discovery.pipeline", capture_input=False, capture_output=False)
 def run_discovery(query: str, include_macro_context: bool, tavily_api_key: str) -> Dict[str, str]:
     system_prompt = get_system_prompt_discovery(include_macro_context)
     base_user_message = get_user_message("discovery", query)
@@ -73,15 +97,30 @@ def run_discovery(query: str, include_macro_context: bool, tavily_api_key: str) 
     initial_md = "\n\n".join(blocks)
     user_message = f"{base_user_message}\n\n{initial_md}"
 
+    tc = current_trace_context()
+
     try:
         extraction_user = f"User query:\n{query.strip()}\n\nWeb excerpts (may be partial):\n{initial_md[:120000]}"
-        extract_text = openrouter_generate(ticker_extract_system(), extraction_user, max_tokens=256, temperature=0)
+        if agent_tracing_enabled():
+            with get_client().start_as_current_observation(
+                name="discovery.ticker-extract",
+                as_type="generation",
+                model=default_openrouter_model(),
+                metadata={"stage": "parse-json-tickers"},
+                input={"query_preview": query.strip()[:500]},
+            ) as extract_obs:
+                extract_text = openrouter_generate(
+                    ticker_extract_system(), extraction_user, max_tokens=256, temperature=0
+                )
+                extract_obs.update(output=truncate_io(extract_text or "", max_chars=4000))
+        else:
+            extract_text = openrouter_generate(ticker_extract_system(), extraction_user, max_tokens=256, temperature=0)
         candidate_tickers = parse_tickers_from_extraction_json(extract_text)
         if candidate_tickers:
             per_ticker_blocks: List[str] = []
             with ThreadPoolExecutor(max_workers=min(5, len(candidate_tickers))) as ex:
                 future_map = {
-                    ex.submit(fundamentals_tavily_markdown, tavily_api_key, t): t for t in candidate_tickers
+                    ex.submit(_enrichment_block, tavily_api_key, t, tc): t for t in candidate_tickers
                 }
                 for f in as_completed(future_map):
                     t = future_map[f]

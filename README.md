@@ -142,7 +142,7 @@ Browser (Next.js 15 / React 19)
 
 Full list and optional flags (Langfuse, Paystack, prompt cache): **`.env.example`**.
 
-**Langfuse prompt overrides (optional):** The Python agent resolves narrative prompts by name (`tickerng-core-rules`, `tickerng-specialist-core`, `tickerng-synthesis-system`, `tickerng-ticker-extract`) as **text** prompts on the configured label (default `production`). If Langfuse is disabled (`LANGFUSE_PROMPTS_ENABLED=false`), keys are missing, or fetch fails, behavior falls back to **`api/agent/prompt_fallbacks.py`**.
+**Langfuse prompt overrides (optional):** The Python agent resolves narrative prompts by name (`tickerng-core-rules`, `tickerng-specialist-core`, `tickerng-synthesis-system`, `tickerng-ticker-extract`) as **text** prompts on the configured label (default `production`). If Langfuse is disabled (`LANGFUSE_PROMPTS_ENABLED=false`), keys are missing, or fetch fails, behavior falls back to **`api/agent/prompts/prompt_fallbacks.py`**.
 
 ---
 

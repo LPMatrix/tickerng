@@ -6,8 +6,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, Optional
 
-from agent.constants import OPENROUTER_CHAT_URL
-from agent.openrouter_helpers import (
+from agent.config.constants import OPENROUTER_CHAT_URL
+from agent.llm.openrouter_helpers import (
     attach_top_level_prompt_cache_if_enabled,
     openrouter_http_error_detail,
 )
