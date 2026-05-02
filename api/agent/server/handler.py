@@ -5,7 +5,7 @@ import traceback
 from http.server import BaseHTTPRequestHandler
 from typing import Any
 
-from agent.llm.openrouter import openrouter_stream_generate
+from agent.llm.openrouter import model_for, openrouter_stream_generate
 from agent.llm.openrouter_helpers import stream_failure_user_message
 from agent.observability.tracing import final_stream_generation, flush_langfuse, root_request_span
 from agent.server.http_utils import json_response
@@ -38,11 +38,13 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801 — Vercel expects this nam
 
                 try:
                     streamed_any = False
-                    with final_stream_generation():
+                    synthesis_model = model_for("synthesis")
+                    with final_stream_generation(model=synthesis_model):
                         for chunk in openrouter_stream_generate(
                             prompt["system"],
                             prompt["user"],
                             max_tokens=8192,
+                            model=synthesis_model,
                         ):
                             streamed_any = True
                             self.wfile.write(chunk.encode("utf-8"))

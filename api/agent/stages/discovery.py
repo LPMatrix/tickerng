@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from langfuse import get_client, observe
 
 from agent.config.constants import GLOBAL_TICKER_NOISE_DOMAINS, MAX_DISCOVERY_ENRICHMENT_TICKERS
-from agent.llm.openrouter import openrouter_generate
+from agent.llm.openrouter import model_for, openrouter_generate
 from agent.prompts.prompt_resolve import ticker_extract_system
 from agent.prompts.prompts import get_system_prompt_discovery, get_user_message
 from agent.search.tavily import tavily_search_to_markdown
@@ -16,7 +16,6 @@ from agent.stages.specialists import fundamentals_tavily_markdown
 from agent.observability.tracing import (
     agent_tracing_enabled,
     current_trace_context,
-    default_openrouter_model,
     threaded_span,
     truncate_io,
 )
@@ -101,20 +100,31 @@ def run_discovery(query: str, include_macro_context: bool, tavily_api_key: str) 
 
     try:
         extraction_user = f"User query:\n{query.strip()}\n\nWeb excerpts (may be partial):\n{initial_md[:120000]}"
+        extract_model = model_for("ticker_extract")
         if agent_tracing_enabled():
             with get_client().start_as_current_observation(
                 name="discovery.ticker-extract",
                 as_type="generation",
-                model=default_openrouter_model(),
+                model=extract_model,
                 metadata={"stage": "parse-json-tickers"},
                 input={"query_preview": query.strip()[:500]},
             ) as extract_obs:
                 extract_text = openrouter_generate(
-                    ticker_extract_system(), extraction_user, max_tokens=256, temperature=0
+                    ticker_extract_system(),
+                    extraction_user,
+                    max_tokens=256,
+                    temperature=0,
+                    model=extract_model,
                 )
                 extract_obs.update(output=truncate_io(extract_text or "", max_chars=4000))
         else:
-            extract_text = openrouter_generate(ticker_extract_system(), extraction_user, max_tokens=256, temperature=0)
+            extract_text = openrouter_generate(
+                ticker_extract_system(),
+                extraction_user,
+                max_tokens=256,
+                temperature=0,
+                model=extract_model,
+            )
         candidate_tickers = parse_tickers_from_extraction_json(extract_text)
         if candidate_tickers:
             per_ticker_blocks: List[str] = []

@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from langfuse import observe
 
 from agent.config.constants import SPECIALIST_KEYS
-from agent.llm.openrouter import openrouter_generate
+from agent.llm.openrouter import model_for, openrouter_generate
 from agent.observability.tracing import current_trace_context, threaded_generation, truncate_io
 from agent.prompts.prompt_resolve import synthesis_system
 from agent.prompts.prompts import get_synthesis_user_message, normalize_ticker
@@ -27,13 +27,20 @@ def run_specialist(
     try:
         search_md = build_specialist_web_context(tavily_api_key, ticker, key)
         user_content = f"{get_specialist_user_message(ticker, key)}\n\n{search_md}"
+        specialist_model = model_for("specialist")
         with threaded_generation(
             name=f"specialist-{key}",
             trace_context=trace_context,
             metadata={"ticker": ticker, "specialist": key},
             input_payload={"ticker": ticker, "specialist": key},
+            model=specialist_model,
         ) as obs:
-            text = openrouter_generate(get_specialist_system_prompt(key), user_content, max_tokens=4096)
+            text = openrouter_generate(
+                get_specialist_system_prompt(key),
+                user_content,
+                max_tokens=4096,
+                model=specialist_model,
+            )
             if obs is not None:
                 obs.update(
                     output=truncate_io(text)

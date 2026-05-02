@@ -130,6 +130,29 @@ Under `content/` (see `[content/README.md](../content/README.md)`): brand guidel
 
 ---
 
+## 10b. Per-role OpenRouter model routing
+
+The Python agent makes three distinct LLM calls; each can use a different OpenRouter model via env vars. All overrides fall back to `OPENROUTER_MODEL`, then to the in-code default (`anthropic/claude-sonnet-4.6`).
+
+| Role | Call site | Suggested tier | Env override |
+|---|---|---|---|
+| `ticker_extract` | `api/agent/stages/discovery.py` (JSON shortlist, 256 tok, temp 0) | small/cheap classifier | `OPENROUTER_MODEL_TICKER_EXTRACT` |
+| `specialist` | `api/agent/stages/verification.py` (4 parallel, 4096 tok) | small/cheap drafter | `OPENROUTER_MODEL_SPECIALIST` |
+| `synthesis` | `api/agent/server/handler.py` (final stream, 8192 tok) | large reasoning model | `OPENROUTER_MODEL_SYNTHESIS` |
+
+Resolver: `agent.llm.openrouter.model_for(role)`. Both `openrouter_generate` and `openrouter_stream_generate` accept an optional `model=` kwarg; Langfuse generation labels (`final_stream_generation`, `threaded_generation`, and the `discovery.ticker-extract` observation) are passed the resolved model so traces reflect what actually ran.
+
+Practical example: run the four specialist memos on a cheap model while reserving the large model for the synthesis stream:
+
+```env
+OPENROUTER_MODEL=anthropic/claude-3-haiku
+OPENROUTER_MODEL_SYNTHESIS=anthropic/claude-sonnet-4.6
+```
+
+If none of the per-role vars are set, behavior matches the previous single-model setup.
+
+---
+
 ## 11. When to update this file
 
 Update when you:

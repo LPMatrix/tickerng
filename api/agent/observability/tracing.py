@@ -49,7 +49,9 @@ def flush_langfuse() -> None:
 
 
 def default_openrouter_model() -> str:
-    return (os.getenv("OPENROUTER_MODEL") or "anthropic/claude-sonnet-4.6").strip()
+    from agent.llm.openrouter import default_model
+
+    return default_model()
 
 
 @contextmanager
@@ -68,7 +70,7 @@ def root_request_span() -> Iterator[None]:
 
 
 @contextmanager
-def final_stream_generation() -> Iterator[None]:
+def final_stream_generation(model: Optional[str] = None) -> Iterator[None]:
     if not agent_tracing_enabled():
         yield
         return
@@ -77,7 +79,7 @@ def final_stream_generation() -> Iterator[None]:
     with get_client().start_as_current_observation(
         name="openrouter-stream",
         as_type="generation",
-        model=default_openrouter_model(),
+        model=model or default_openrouter_model(),
         metadata={"stage": "final-report-markdown"},
     ):
         yield
@@ -96,6 +98,7 @@ def threaded_generation(
     trace_context: Optional[Dict[str, str]],
     metadata: Optional[Dict[str, Any]] = None,
     input_payload: Optional[Any] = None,
+    model: Optional[str] = None,
 ) -> Iterator[Any]:
     """LLM generation running in a ThreadPoolExecutor worker (linked via ``trace_context``)."""
     if not agent_tracing_enabled() or not trace_context:
@@ -107,7 +110,7 @@ def threaded_generation(
         trace_context=trace_context,
         name=name,
         as_type="generation",
-        model=default_openrouter_model(),
+        model=model or default_openrouter_model(),
         metadata=metadata or {},
         input=input_payload,
     ) as obs:

@@ -12,15 +12,42 @@ from agent.llm.openrouter_helpers import (
     openrouter_http_error_detail,
 )
 
+DEFAULT_MODEL = "anthropic/claude-sonnet-4.6"
 
-def openrouter_generate(system: str, user_content: str, max_tokens: int, temperature: Optional[float] = None) -> str:
+_ROLE_ENV = {
+    "synthesis": "OPENROUTER_MODEL_SYNTHESIS",
+    "specialist": "OPENROUTER_MODEL_SPECIALIST",
+    "ticker_extract": "OPENROUTER_MODEL_TICKER_EXTRACT",
+}
+
+
+def default_model() -> str:
+    return (os.getenv("OPENROUTER_MODEL") or DEFAULT_MODEL).strip()
+
+
+def model_for(role: str) -> str:
+    env_var = _ROLE_ENV.get(role)
+    if env_var:
+        override = (os.getenv(env_var) or "").strip()
+        if override:
+            return override
+    return default_model()
+
+
+def openrouter_generate(
+    system: str,
+    user_content: str,
+    max_tokens: int,
+    temperature: Optional[float] = None,
+    model: Optional[str] = None,
+) -> str:
     api_key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
-    model = (os.getenv("OPENROUTER_MODEL") or "anthropic/claude-sonnet-4.6").strip()
+    resolved_model = (model or default_model()).strip()
     if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY is not configured")
 
     payload: Dict[str, Any] = {
-        "model": model,
+        "model": resolved_model,
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": user_content},
@@ -62,14 +89,15 @@ def openrouter_stream_generate(
     user_content: str,
     max_tokens: int,
     temperature: Optional[float] = None,
+    model: Optional[str] = None,
 ):
     api_key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
-    model = (os.getenv("OPENROUTER_MODEL") or "anthropic/claude-sonnet-4.6").strip()
+    resolved_model = (model or default_model()).strip()
     if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY is not configured")
 
     payload: Dict[str, Any] = {
-        "model": model,
+        "model": resolved_model,
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": user_content},
