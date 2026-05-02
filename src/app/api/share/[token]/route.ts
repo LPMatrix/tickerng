@@ -34,7 +34,7 @@ export async function GET(
       query: reportTable.query,
     })
     .from(reportTable)
-    .where(eq(reportTable.id, share.reportId))
+    .where(and(eq(reportTable.id, share.reportId), isNull(reportTable.deletedAt)))
     .limit(1);
   if (!reportRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

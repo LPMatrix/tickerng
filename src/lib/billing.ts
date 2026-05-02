@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { report as reportTable, userSubscription as subscriptionTable } from "@/db/schema";
-import { eq, and, gte, count } from "drizzle-orm";
+import { eq, and, gte, count, isNull } from "drizzle-orm";
 
 export const FREE_MONTHLY_VERIFICATIONS = 3;
 
@@ -25,7 +25,8 @@ export async function getMonthlyVerificationCount(userId: string): Promise<numbe
       and(
         eq(reportTable.userId, userId),
         eq(reportTable.mode, "verification"),
-        gte(reportTable.createdAt, startOfMonth)
+        gte(reportTable.createdAt, startOfMonth),
+        isNull(reportTable.deletedAt)
       )
     );
   return row?.count ?? 0;

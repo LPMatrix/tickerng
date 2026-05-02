@@ -8,6 +8,8 @@ export const report = sqliteTable("report", {
   query: text("query").notNull(),
   content: text("content").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp_ms" }).notNull(),
+  /** Set when the user deletes a report (row retained for audit / quota accuracy). */
+  deletedAt: integer("deletedAt", { mode: "timestamp_ms" }),
 });
 
 /** Paystack subscription record keyed by Clerk user ID. */

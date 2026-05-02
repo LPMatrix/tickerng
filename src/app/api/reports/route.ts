@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { report as reportTable } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, isNull } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 const MAX_LIST = 50;
@@ -20,7 +20,7 @@ export async function GET() {
       createdAt: reportTable.createdAt,
     })
     .from(reportTable)
-    .where(eq(reportTable.userId, userId))
+    .where(and(eq(reportTable.userId, userId), isNull(reportTable.deletedAt)))
     .orderBy(desc(reportTable.createdAt))
     .limit(MAX_LIST);
   return NextResponse.json(rows);

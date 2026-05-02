@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { report as reportTable, reportShare as reportShareTable } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { randomBytes } from "crypto";
 
@@ -24,7 +24,9 @@ export async function GET(
   const [row] = await db
     .select()
     .from(reportTable)
-    .where(and(eq(reportTable.id, id), eq(reportTable.userId, userId)))
+    .where(
+      and(eq(reportTable.id, id), eq(reportTable.userId, userId), isNull(reportTable.deletedAt))
+    )
     .limit(1);
   if (!row) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -41,14 +43,33 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  const result = await db
-    .delete(reportTable)
-    .where(and(eq(reportTable.id, id), eq(reportTable.userId, userId)))
+  const now = new Date();
+  const [updated] = await db
+    .update(reportTable)
+    .set({ deletedAt: now })
+    .where(
+      and(
+        eq(reportTable.id, id),
+        eq(reportTable.userId, userId),
+        isNull(reportTable.deletedAt)
+      )
+    )
     .returning({ id: reportTable.id });
-  if (result.length === 0) {
+  if (updated) {
+    return new NextResponse(null, { status: 204 });
+  }
+  const [existing] = await db
+    .select({ deletedAt: reportTable.deletedAt })
+    .from(reportTable)
+    .where(and(eq(reportTable.id, id), eq(reportTable.userId, userId)))
+    .limit(1);
+  if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  return new NextResponse(null, { status: 204 });
+  if (existing.deletedAt) {
+    return new NextResponse(null, { status: 204 });
+  }
+  return NextResponse.json({ error: "Could not delete report" }, { status: 500 });
 }
 
 export async function POST(
@@ -63,7 +84,13 @@ export async function POST(
   const [reportRow] = await db
     .select()
     .from(reportTable)
-    .where(and(eq(reportTable.id, reportId), eq(reportTable.userId, userId)))
+    .where(
+      and(
+        eq(reportTable.id, reportId),
+        eq(reportTable.userId, userId),
+        isNull(reportTable.deletedAt)
+      )
+    )
     .limit(1);
   if (!reportRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
