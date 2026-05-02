@@ -215,4 +215,5 @@ npm test
 
 ## See also
 
+- **`docs/PROJECT_LEARNINGS.md`** — project decisions, deployment pitfalls, and operational notes (commit this file so the team keeps it).
 - **`.env.example`** — full environment reference.
