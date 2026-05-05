@@ -31,8 +31,9 @@ def get_user_message(mode: str, query: str) -> str:
     return f'Produce a discovery report for the following query: "{q}". Follow the required section structure and return a shortlist of 3-5 stocks with brief rationale, using the excerpts below.'
 
 
-def get_synthesis_user_message(ticker: str, memos: dict) -> str:
+def get_synthesis_user_message(ticker: str, memos: dict, contrarian_memo: str = "") -> str:
     t = ticker.upper()
+    contra = (contrarian_memo or "").strip() or "(Contrarian memo unavailable — note reduced adversarial coverage.)"
     return f"""Produce the final verification report for NGX ticker {t}.
 
 <fundamentals_memo>
@@ -50,4 +51,8 @@ def get_synthesis_user_message(ticker: str, memos: dict) -> str:
 <sentiment_memo>
 {memos.get("sentiment", "")}
 </sentiment_memo>
+
+<contrarian_memo>
+{contra}
+</contrarian_memo>
 """

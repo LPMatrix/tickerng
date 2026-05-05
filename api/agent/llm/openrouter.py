@@ -17,6 +17,7 @@ DEFAULT_MODEL = "anthropic/claude-sonnet-4.6"
 _ROLE_ENV = {
     "synthesis": "OPENROUTER_MODEL_SYNTHESIS",
     "specialist": "OPENROUTER_MODEL_SPECIALIST",
+    "contrarian": "OPENROUTER_MODEL_CONTRARIAN",
     "ticker_extract": "OPENROUTER_MODEL_TICKER_EXTRACT",
 }
 

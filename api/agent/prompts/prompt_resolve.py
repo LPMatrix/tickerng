@@ -5,7 +5,8 @@ Create **text** prompts in Langfuse with these names (Production label by defaul
 
 - ``tickerng-core-rules`` — shared NGX reporting rules (discovery + verification tone).
 - ``tickerng-specialist-core`` — specialist memo wrapper (verification parallel passes).
-- ``tickerng-synthesis-system`` — final verification report from four memos.
+- ``tickerng-synthesis-system`` — final verification report from four specialist memos + contrarian memo.
+- ``tickerng-contrarian-system`` — bear-side critique pass between specialists and synthesis (verification only).
 - ``tickerng-ticker-extract`` — JSON ticker shortlist for discovery enrichment.
 
 Disable remote resolution: ``LANGFUSE_PROMPTS_ENABLED=false`` or omit Langfuse keys (falls back always).
@@ -19,6 +20,7 @@ import os
 from typing import Optional
 
 from agent.prompts.prompt_fallbacks import (
+    CONTRARIAN_SYSTEM,
     CORE_RULES,
     SPECIALIST_CORE,
     SYNTHESIS_SYSTEM,
@@ -98,6 +100,10 @@ def specialist_core() -> str:
 
 def synthesis_system() -> str:
     return _resolve_text("tickerng-synthesis-system", SYNTHESIS_SYSTEM)
+
+
+def contrarian_system() -> str:
+    return _resolve_text("tickerng-contrarian-system", CONTRARIAN_SYSTEM)
 
 
 def ticker_extract_system() -> str:
