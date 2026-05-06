@@ -2,7 +2,7 @@
 
 **Purpose:** Prioritized recommendations beyond the current **specialists → contrarian → synthesis** verification pipeline. For how the stack works today, see **[PROJECT_LEARNINGS.md §8](./PROJECT_LEARNINGS.md)**.
 
-**Last updated:** 2026-05-05
+**Last updated:** 2026-05-06
 
 **Principles:**
 
@@ -104,6 +104,22 @@
 
 ---
 
+## Phase G — Background-completion awareness (tab unfocused)
+
+**Goal:** When a streamed report finishes while the user has switched tabs or minimized the window, surface a clear signal so they are not waiting on a hidden tab.
+
+**Recommendations:**
+
+1. **Detection** — After the research stream completes in `handleSubmit` (`src/app/research/page.tsx`), check `document.hidden` / `document.visibilityState === 'hidden'` via the [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API).
+2. **System notifications** — [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API): call `Notification.requestPermission()` after a **user gesture** (e.g. first “Run research” click or a Settings toggle). When completion fires and the tab is hidden, show `new Notification(...)` with a stable `tag` to avoid stacking duplicates; optional `notification.onclick` → `window.focus()` (and `/research` if needed).
+3. **Permission UX** — One-time prompt or explicit “Notify when ready in background” preference in `localStorage`; respect `denied` and Safari / iOS constraints with a documented fallback.
+4. **Fallback** — If permission is unavailable or denied: optional `document.title` prefix (e.g. `(Ready)`) until `visibilitychange` when the tab regains focus, or an in-app toast only when the document becomes visible again.
+5. **Scope** — Notify on successful completion with content; decide separately for terminal errors vs quota responses (`402`).
+
+**Effort:** Small. **Risks:** iOS/Safari notification limitations; treat permission as best-effort.
+
+---
+
 ## What we are **not** recommending (yet)
 
 - **Full TradingAgents clone** (sequential tool analysts, bull/bear debate graph, checkpoints) unless TickerNG becomes a **portfolio / backtest** product — operational cost and debugging surface dominate.
@@ -113,14 +129,16 @@
 
 ## Suggested sequencing
 
-1. **Phase A** — Structured verdict + tests ( measurable uplift for product analytics ).
-2. **Phase B or C** — Choose **risk officer** if narratives feel shallow; choose **contrarian retrieval** if negatives are systematically missed.
-3. **Phase D** — Once retention / “same ticker again” workflows matter.
-4. **Phase E** — Data-licensing clarity required.
+1. **Phase A** — Structured verdict + tests (measurable uplift for product analytics).
+2. **Phase G** — Background-completion notifications + title fallback (small UX win once streaming completion hook is stable).
+3. **Phase B or C** — Choose **risk officer** if narratives feel shallow; choose **contrarian retrieval** if negatives are systematically missed.
+4. **Phase F** — Discovery parity when verification UX feels mature.
+5. **Phase D** — Once retention / “same ticker again” workflows matter.
+6. **Phase E** — Data-licensing clarity required.
 
 ---
 
 ## See also
 
 - **[PROJECT_LEARNINGS.md](./PROJECT_LEARNINGS.md)** — deployment, routing, §8 pipeline detail, OpenRouter roles.
-- `**api/agent/prompts/prompt_fallbacks.py`** — canonical prompt text when Langfuse is off.
+- `api/agent/prompts/prompt_fallbacks.py` — canonical prompt text when Langfuse is off.

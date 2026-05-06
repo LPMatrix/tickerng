@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ModeSelector, type ResearchMode } from "@/components/ModeSelector";
 import { ResearchForm } from "@/components/ResearchForm";
 import { ReportView } from "@/components/ReportView";
@@ -24,6 +25,12 @@ export default function ResearchPage() {
   const [query, setQuery] = useState("");
   const [usageVersion, setUsageVersion] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("tickerng:sidebar");
@@ -31,9 +38,16 @@ export default function ResearchPage() {
   }, []);
 
   useEffect(() => {
-    if (!sidebarOpen) return;
+    if (!mounted || typeof window === "undefined") return;
     const mq = window.matchMedia("(max-width: 767px)");
-    if (!mq.matches) return;
+    const sync = () => setIsMobileLayout(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!sidebarOpen || !isMobileLayout) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSidebarOpen(false);
@@ -47,7 +61,7 @@ export default function ResearchPage() {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [sidebarOpen]);
+  }, [sidebarOpen, isMobileLayout]);
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => {
@@ -152,7 +166,50 @@ export default function ResearchPage() {
     }
   }, []);
 
+  const handleSelectReportAndCloseMobile = useCallback(
+    async (id: string) => {
+      await handleSelectReport(id);
+      if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+        setSidebarOpen(false);
+        localStorage.setItem("tickerng:sidebar", "closed");
+      }
+    },
+    [handleSelectReport]
+  );
+
   const hasReport = report.trim().length > 0;
+
+  const sidebarInner = (
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-6 md:sticky md:top-0 md:max-h-[calc(100vh-4rem)]">
+      <div className="mb-4 flex flex-shrink-0 items-center justify-between md:hidden">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-mute)]">
+          Recent Reports
+        </span>
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="rounded-md p-1 text-[var(--color-mute)] hover:text-[var(--color-accent)]"
+          aria-label="Close recent reports"
+        >
+          <ChevronLeft className="h-4 w-4 rotate-90" />
+        </button>
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
+        <ReportHistory
+          reportsVersion={reportsVersion}
+          onSelectReport={handleSelectReportAndCloseMobile}
+          currentReportId={currentReportId}
+          onReportDeleted={(id) => {
+            if (currentReportId === id) {
+              setCurrentReportId(null);
+              setReport("");
+              setQuery("");
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
 
   const handleShare = useCallback(async () => {
     if (!currentReportId) return;
@@ -176,14 +233,26 @@ export default function ResearchPage() {
       <Header />
 
       <div className="relative flex flex-1 flex-col md:flex-row">
-        {sidebarOpen && (
-          <button
-            type="button"
-            aria-label="Close reports sidebar"
-            className="fixed inset-0 z-30 bg-[var(--color-ink)]/40 backdrop-blur-[1px] md:hidden"
-            onClick={toggleSidebar}
-          />
-        )}
+        {mounted &&
+          sidebarOpen &&
+          isMobileLayout &&
+          createPortal(
+            <div className="fixed inset-0 z-[200] md:hidden" data-tickerng-mobile-reports-drawer>
+              <button
+                type="button"
+                aria-label="Close reports sidebar"
+                className="absolute inset-0 bg-[var(--color-ink)]/40 backdrop-blur-[1px]"
+                onClick={toggleSidebar}
+              />
+              <aside
+                aria-label="Recent reports"
+                className="absolute bottom-0 right-0 top-16 z-10 flex w-[88vw] max-w-[21rem] flex-col border-l border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl"
+              >
+                {sidebarInner}
+              </aside>
+            </div>,
+            document.body
+          )}
 
         {/* Main Content Area */}
         <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8 lg:px-12">
@@ -314,13 +383,13 @@ export default function ResearchPage() {
           </div>
         </main>
 
-        {/* Sidebar: Recent reports — mobile: partial-width slide-over; md+: inline column */}
+        {/* Sidebar: desktop inline column; mobile drawer is portaled to document.body */}
         <aside
           aria-label="Recent reports"
           className={`relative flex-shrink-0 border-[var(--color-border)] bg-[var(--color-surface)] transition-[transform,width,box-shadow] duration-300 ease-out md:border-l md:border-t-0 ${
             sidebarOpen
-              ? "fixed inset-y-0 right-0 z-40 flex h-dvh w-[min(21rem,88vw)] max-w-[88vw] flex-col border-l border-t-0 shadow-2xl md:static md:z-auto md:h-auto md:min-h-0 md:w-80 md:max-w-none md:shadow-none"
-              : "hidden md:flex md:h-auto md:w-10"
+              ? "max-md:hidden md:relative md:flex md:h-auto md:min-h-0 md:w-80 md:flex-col md:border-l md:shadow-none"
+              : "hidden md:relative md:flex md:h-auto md:w-10"
           }`}
         >
           {/* Collapse toggle — desktop only */}
@@ -344,39 +413,8 @@ export default function ResearchPage() {
             </div>
           )}
 
-          {/* Expanded content */}
-          {sidebarOpen && (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-6 md:sticky md:top-0 md:max-h-[calc(100vh-4rem)]">
-              {/* Mobile collapse toggle */}
-              <div className="mb-4 flex flex-shrink-0 items-center justify-between md:hidden">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-mute)]">
-                  Recent Reports
-                </span>
-                <button
-                  type="button"
-                  onClick={toggleSidebar}
-                  className="rounded-md p-1 text-[var(--color-mute)] hover:text-[var(--color-accent)]"
-                  aria-label="Close recent reports"
-                >
-                  <ChevronLeft className="h-4 w-4 rotate-90" />
-                </button>
-              </div>
-              <div className="min-h-0 flex-1 overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
-              <ReportHistory
-                reportsVersion={reportsVersion}
-                onSelectReport={handleSelectReport}
-                currentReportId={currentReportId}
-                onReportDeleted={(id) => {
-                  if (currentReportId === id) {
-                    setCurrentReportId(null);
-                    setReport("");
-                    setQuery("");
-                  }
-                }}
-              />
-              </div>
-            </div>
-          )}
+          {/* Expanded content (desktop only — mobile uses portal) */}
+          {sidebarOpen && sidebarInner}
         </aside>
 
         {!sidebarOpen && (
