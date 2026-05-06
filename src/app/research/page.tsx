@@ -30,6 +30,25 @@ export default function ResearchPage() {
     if (saved === "closed") setSidebarOpen(false);
   }, []);
 
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    if (!mq.matches) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSidebarOpen(false);
+        localStorage.setItem("tickerng:sidebar", "closed");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [sidebarOpen]);
+
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => {
       const next = !prev;
@@ -156,7 +175,16 @@ export default function ResearchPage() {
       {/* Top Navigation Bar */}
       <Header />
 
-      <div className="flex flex-1 flex-col md:flex-row">
+      <div className="relative flex flex-1 flex-col md:flex-row">
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close reports sidebar"
+            className="fixed inset-0 z-30 bg-[var(--color-ink)]/40 backdrop-blur-[1px] md:hidden"
+            onClick={toggleSidebar}
+          />
+        )}
+
         {/* Main Content Area */}
         <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8 lg:px-12">
           <div className="mx-auto max-w-4xl">
@@ -286,13 +314,13 @@ export default function ResearchPage() {
           </div>
         </main>
 
-        {/* Sidebar: Recent Reports */}
+        {/* Sidebar: Recent reports — mobile: partial-width slide-over; md+: inline column */}
         <aside
           aria-label="Recent reports"
-          className={`relative flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface)] transition-all duration-300 md:border-l md:border-t-0 ${
+          className={`relative flex-shrink-0 border-[var(--color-border)] bg-[var(--color-surface)] transition-[transform,width,box-shadow] duration-300 ease-out md:border-l md:border-t-0 ${
             sidebarOpen
-              ? "w-full md:w-80"
-              : "w-full md:w-10"
+              ? "fixed inset-y-0 right-0 z-40 flex h-dvh w-[min(21rem,88vw)] max-w-[88vw] flex-col border-l border-t-0 shadow-2xl md:static md:z-auto md:h-auto md:min-h-0 md:w-80 md:max-w-none md:shadow-none"
+              : "hidden md:flex md:h-auto md:w-10"
           }`}
         >
           {/* Collapse toggle — desktop only */}
@@ -318,9 +346,9 @@ export default function ResearchPage() {
 
           {/* Expanded content */}
           {sidebarOpen && (
-            <div className="sticky top-0 p-6">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-6 md:sticky md:top-0 md:max-h-[calc(100vh-4rem)]">
               {/* Mobile collapse toggle */}
-              <div className="mb-4 flex items-center justify-between md:hidden">
+              <div className="mb-4 flex flex-shrink-0 items-center justify-between md:hidden">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-mute)]">
                   Recent Reports
                 </span>
@@ -328,10 +356,12 @@ export default function ResearchPage() {
                   type="button"
                   onClick={toggleSidebar}
                   className="rounded-md p-1 text-[var(--color-mute)] hover:text-[var(--color-accent)]"
+                  aria-label="Close recent reports"
                 >
                   <ChevronLeft className="h-4 w-4 rotate-90" />
                 </button>
               </div>
+              <div className="min-h-0 flex-1 overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
               <ReportHistory
                 reportsVersion={reportsVersion}
                 onSelectReport={handleSelectReport}
@@ -344,9 +374,22 @@ export default function ResearchPage() {
                   }
                 }}
               />
+              </div>
             </div>
           )}
         </aside>
+
+        {!sidebarOpen && (
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="fixed bottom-5 right-4 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-accent)] shadow-lg md:hidden"
+            aria-label="Open recent reports"
+            title="Recent reports"
+          >
+            <History className="h-5 w-5" />
+          </button>
+        )}
       </div>
     </div>
   );
